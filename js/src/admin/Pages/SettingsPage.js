@@ -1,9 +1,9 @@
-import ExtensionPage from 'flarum/components/ExtensionPage';
+import ExtensionPage from 'flarum/admin/components/ExtensionPage';
 import SeoSettings from "../components/Forms/SeoSettings";
 import HealthCheck from './HealthCheck';
 import RegisterToSearchEngines from './RegisterToSearchEngines';
 import SSLPage from './SSLPage';
-import Button from 'flarum/components/Button';
+import Button from 'flarum/common/components/Button';
 import Sitemap from './Sitemap';
 
 export default class SettingsPage extends ExtensionPage {
@@ -32,7 +32,7 @@ export default class SettingsPage extends ExtensionPage {
         className: `Button ${page === 'health' ? 'item-selected' : ''}`,
         onclick: () => m.route.set(
           app.route('extension', {
-            id: 'v17development-seo'
+            id: 'ernestdefoe-seo'
           })
         ),
         icon: 'fas fa-heartbeat',
@@ -41,7 +41,7 @@ export default class SettingsPage extends ExtensionPage {
         className: `Button ${page === 'settings' ? 'item-selected' : ''}`,
         onclick: () => m.route.set(
           app.route('extension', {
-            id: 'v17development-seo',
+            id: 'ernestdefoe-seo',
             page: 'settings'
           })
         ),
@@ -51,7 +51,7 @@ export default class SettingsPage extends ExtensionPage {
         className: `Button ${page === 'sitemap' ? 'item-selected' : ''}`,
         onclick: () => m.route.set(
           app.route('extension', {
-            id: 'v17development-seo',
+            id: 'ernestdefoe-seo',
             page: 'sitemap'
           })
         ),
@@ -61,7 +61,7 @@ export default class SettingsPage extends ExtensionPage {
         className: `Button ${page === 'search-engines' ? 'item-selected' : ''}`,
         onclick: () => m.route.set(
           app.route('extension', {
-            id: 'v17development-seo',
+            id: 'ernestdefoe-seo',
             page: 'search-engines'
           })
         ),
@@ -71,7 +71,7 @@ export default class SettingsPage extends ExtensionPage {
         className: `Button ${page === 'ssl' ? 'item-selected' : ''}`,
         onclick: () => m.route.set(
           app.route('extension', {
-            id: 'v17development-seo',
+            id: 'ernestdefoe-seo',
             page: 'ssl'
           })
         ),

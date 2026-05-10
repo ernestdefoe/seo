@@ -1,5 +1,5 @@
-import DashboardWidget from 'flarum/components/DashboardWidget';
-import Button from 'flarum/components/Button';
+import DashboardWidget from 'flarum/admin/components/DashboardWidget';
+import Button from 'flarum/common/components/Button';
 
 export default class SeoWidget extends DashboardWidget {
   oninit(vnode) {
@@ -29,7 +29,7 @@ export default class SeoWidget extends DashboardWidget {
         {Button.component({
           className: '',
           icon: 'far fa-thumbs-up',
-          onclick: () => m.route.set("extension/v17development-seo")
+          onclick: () => m.route.set(app.route('extension', { id: 'ernestdefoe-seo' }))
         }, 'Do the health-check!')}
       </div>
     );

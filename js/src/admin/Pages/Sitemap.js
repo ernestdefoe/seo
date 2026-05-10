@@ -1,5 +1,5 @@
-import Page from 'flarum/components/Page';
-import Link from 'flarum/components/Link';
+import Page from 'flarum/common/components/Page';
+import Link from 'flarum/common/components/Link';
 import Header from "../components/Header";
 
 export default class Sitemap extends Page {

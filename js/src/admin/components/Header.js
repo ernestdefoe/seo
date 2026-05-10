@@ -1,6 +1,6 @@
 import Component from 'flarum/common/Component';
-import Button from 'flarum/components/Button';
-import Dropdown from 'flarum/components/Dropdown';
+import Button from 'flarum/common/components/Button';
+import Dropdown from 'flarum/common/components/Dropdown';
 
 export default class Header extends Component {
     view() {

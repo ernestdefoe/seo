@@ -1,23 +1,23 @@
-import app from "flarum/app";
-import { extend } from "flarum/extend";
-import DashboardPage from "flarum/components/DashboardPage";
+import app from "flarum/admin/app";
+import { extend } from "flarum/common/extend";
+import DashboardPage from "flarum/admin/components/DashboardPage";
 import SeoWidget from "./components/SeoWidget";
 import SettingsPage from "./Pages/SettingsPage";
 import PermissionGrid from "flarum/admin/components/PermissionGrid";
 
-app.initializers.add("v17development-flarum-seo", () => {
-  app.extensionData.for("v17development-seo").registerPage(SettingsPage);
+app.initializers.add("ernestdefoe-seo", () => {
+  app.extensionData.for("ernestdefoe-seo").registerPage(SettingsPage);
 
   // Add widget
   extend(DashboardPage.prototype, "availableWidgets", (widgets) => {
     widgets.add("seo-widget", <SeoWidget />, 500);
   });
 
-  app.extensionData.for("v17development-seo").registerPermission(
+  app.extensionData.for("ernestdefoe-seo").registerPermission(
     {
       icon: "fas fa-search",
       label: app.translator.trans(
-        "v17development-flarum-seo.admin.permissions.configure_seo"
+        "ernestdefoe-seo.admin.permissions.configure_seo"
       ),
       permission: "seo.canConfigure",
     },
@@ -34,7 +34,7 @@ app.initializers.add("v17development-flarum-seo", () => {
         label: "SEO",
         children: this.attrs.extensionId
           ? app.extensionData
-              .getExtensionPermissions(this.extensionId, "seo")
+              .getExtensionPermissions(this.attrs.extensionId, "seo")
               .toArray()
           : app.extensionData.getAllExtensionPermissions("seo").toArray(),
       },

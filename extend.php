@@ -46,7 +46,7 @@ return [
     ->css(__DIR__ . '/less/Admin.less'),
 
   (new Extend\Routes('forum'))
-    ->get('/robots.txt', 'v17development-flarum-seo', Robots::class),
+    ->get('/robots.txt', 'ernestdefoe-seo.robots', Robots::class),
 
   (new Extend\Routes('api'))
     ->post('/seo_social_media_image', 'seo.socialmedia.upload', Api\Controllers\UploadSocialMediaImageController::class)

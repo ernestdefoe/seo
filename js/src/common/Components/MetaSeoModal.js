@@ -1,10 +1,10 @@
-import Modal from "flarum/components/Modal";
-import Button from "flarum/components/Button";
-import Switch from "flarum/components/Switch";
-import Stream from "flarum/utils/Stream";
+import Modal from "flarum/common/components/Modal";
+import Button from "flarum/common/components/Button";
+import Switch from "flarum/common/components/Switch";
+import Stream from "flarum/common/utils/Stream";
 import Alert from "flarum/common/components/Alert";
 import LoadingIndicator from "flarum/common/components/LoadingIndicator";
-import FieldSet from "flarum/components/FieldSet";
+import FieldSet from "flarum/common/components/FieldSet";
 import countKeywords from "../../admin/utils/countKeywords";
 import clsx from "clsx";
 

@@ -1,7 +1,7 @@
-import Modal from 'flarum/components/Modal';
-import Button from 'flarum/components/Button';
-import saveSettings from 'flarum/utils/saveSettings';
-import Stream from 'flarum/utils/Stream';
+import Modal from 'flarum/common/components/Modal';
+import Button from 'flarum/common/components/Button';
+import saveSettings from 'flarum/admin/utils/saveSettings';
+import Stream from 'flarum/common/utils/Stream';
 
 export default class DoFollowListModal extends Modal {
   oninit(vnode) {

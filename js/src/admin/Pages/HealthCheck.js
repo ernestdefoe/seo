@@ -1,7 +1,7 @@
-import Page from 'flarum/components/Page';
-import Button from 'flarum/components/Button';
+import Page from 'flarum/common/components/Page';
+import Button from 'flarum/common/components/Button';
 import Header from "../components/Header";
-import saveSettings from 'flarum/utils/saveSettings';
+import saveSettings from 'flarum/admin/utils/saveSettings';
 
 export default class HealthCheck extends Page {
   oninit(vnode) {
@@ -103,7 +103,7 @@ export default class HealthCheck extends Page {
             'Your forum does not force a SSL/TLS connection (a secure connection to your website). Most search engines won\'t index your website or lower your ranking if you have no secure connection available.', 
             'How to set up SSL', 
             app.route('extension', {
-              id: 'v17development-seo',
+              id: 'ernestdefoe-seo',
               page: 'ssl'
             })
           )}
@@ -167,7 +167,7 @@ export default class HealthCheck extends Page {
             'It is highly recommended to install the FriendsOfFlarum sitemap extension!', 
             'Read more about adding a sitemap',
             app.route('extension', {
-              id: 'v17development-seo',
+              id: 'ernestdefoe-seo',
               page: 'sitemap'
             })
           )}
@@ -217,7 +217,7 @@ export default class HealthCheck extends Page {
             'You will need to review this to pass.', 
             'More information', 
             app.route('extension', {
-              id: 'v17development-seo',
+              id: 'ernestdefoe-seo',
               page: 'search-engines'
             })
           )}
@@ -269,12 +269,12 @@ export default class HealthCheck extends Page {
   {
     if(setting === '') {
       return app.route('extension', {
-        id: 'v17development-seo',
+        id: 'ernestdefoe-seo',
       });
     }
 
     return app.route('extension', {
-      id: 'v17development-seo',
+      id: 'ernestdefoe-seo',
       page: 'settings',
       setting: setting
     });

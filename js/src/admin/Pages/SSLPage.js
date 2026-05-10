@@ -1,4 +1,4 @@
-import Page from 'flarum/components/Page';
+import Page from 'flarum/common/components/Page';
 
 export default class SSLPage extends Page {
   view() {

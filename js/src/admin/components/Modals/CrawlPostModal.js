@@ -1,7 +1,7 @@
-import Modal from 'flarum/components/Modal';
-import Button from 'flarum/components/Button';
-import Switch from 'flarum/components/Switch';
-import saveSettings from 'flarum/utils/saveSettings';
+import Modal from 'flarum/common/components/Modal';
+import Button from 'flarum/common/components/Button';
+import Switch from 'flarum/common/components/Switch';
+import saveSettings from 'flarum/admin/utils/saveSettings';
 
 export default class CrawlPostModal extends Modal {
   oninit(vnode) {

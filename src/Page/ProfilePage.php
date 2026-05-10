@@ -60,12 +60,12 @@ class ProfilePage implements PageDriverInterface
         }
 
         // Profile title
-        $profileTitle = $this->translator->trans("v17development-flarum-seo.forum.profile_title", [
+        $profileTitle = $this->translator->trans("ernestdefoe-seo.forum.profile_title", [
             'username' => $user->getAttribute('display_name'),
         ]);
 
         // Profile description
-        $profileDescription = $this->translator->trans("v17development-flarum-seo.forum.profile_description", [
+        $profileDescription = $this->translator->trans("ernestdefoe-seo.forum.profile_description", [
             'username' => $user->getAttribute('display_name'),
             'discussion_count' => $user->getAttribute('discussion_count'),
             'comment_count' => $user->getAttribute('comment_count')

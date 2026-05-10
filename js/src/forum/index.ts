@@ -9,12 +9,12 @@ import Model from "flarum/common/Model";
 
 export * from "../common/extend";
 
-app.initializers.add("v17development-flarum-seo", () => {
+app.initializers.add("ernestdefoe-seo", () => {
   extend(
     DiscussionControls,
     "moderationControls",
     function (items, discussion) {
-      if (!app.forum.attribute("canConfigureSeo")) return;
+      if (!app.forum.attribute('canConfigureSeo')) return;
 
       items.add(
         "manageSeo",
@@ -28,7 +28,7 @@ app.initializers.add("v17development-flarum-seo", () => {
               }),
           },
           app.translator.trans(
-            "v17development-flarum-seo.forum.controls.configure_seo"
+            "ernestdefoe-seo.forum.controls.configure_seo"
           )
         ),
         -1000

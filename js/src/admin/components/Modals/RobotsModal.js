@@ -1,6 +1,6 @@
-import Modal from 'flarum/components/Modal';
-import Button from 'flarum/components/Button';
-import saveSettings from 'flarum/utils/saveSettings';
+import Modal from 'flarum/common/components/Modal';
+import Button from 'flarum/common/components/Button';
+import saveSettings from 'flarum/admin/utils/saveSettings';
 
 export default class RobotsModal extends Modal {
   oninit(vnode) {

@@ -2,10 +2,8 @@
 
 namespace V17Development\FlarumSeo\Listeners;
 
-// FlarumSEO classes
-use Flarum\Extension\ExtensionManager;
-
 // Flarum classes
+use Flarum\Extension\ExtensionManager;
 use Flarum\Http\UrlGenerator;
 use Flarum\Frontend\Document;
 use Flarum\Settings\SettingsRepositoryInterface;
@@ -55,32 +53,20 @@ class PageListener
 
     protected Cloud $assets;
 
-    /**
-     * PageListener constructor.
-     *
-     * @param SettingsRepositoryInterface $settings
-     * @param UrlGenerator $url
-     * @param ExtensionManager $extensions
-     * @param PageManager $pageManager
-     */
+    protected bool $ogImageActive = false;
+
     public function __construct(
         SettingsRepositoryInterface $settings,
         UrlGenerator $url,
         PageManager $pageManager,
-        Container $container
+        Container $container,
+        ExtensionManager $extensions
     ) {
-        // Get Flarum settings
         $this->settings = $settings;
-
-        // Get page manager
         $this->pageManager = $pageManager;
-
-        // Set forum base URL
         $this->applicationUrl = $url->to('forum')->base();
-
         $this->assets = $container->make('filesystem')->disk('flarum-assets');
-
-        // Settings debug settings: var_dump($this->settings->all());exit;
+        $this->ogImageActive = $extensions->isEnabled('ernestdefoe-og-image');
     }
 
     /**
@@ -154,17 +140,15 @@ class PageListener
             "logo" => $applicationLogo ? $this->applicationUrl . '/assets/' . $applicationLogo : null
         ]);
 
-        // Set image
-        if ($applicationSeoSocialMediaImage !== null) {
-            $this->setImage($this->assets->url($applicationSeoSocialMediaImage));
-        }
-        // Fallback to the logo
-        else if ($applicationLogo !== null) {
-            $this->setImage($this->assets->url($applicationLogo));
-        }
-        // Fallback to the favicon
-        else if ($applicationFavicon !== null) {
-            $this->setImage($this->assets->url($applicationFavicon));
+        // Skip og:image when ernestdefoe/og-image is active — it handles image tags
+        if (!$this->ogImageActive) {
+            if ($applicationSeoSocialMediaImage !== null) {
+                $this->setImage($this->assets->url($applicationSeoSocialMediaImage));
+            } elseif ($applicationLogo !== null) {
+                $this->setImage($this->assets->url($applicationLogo));
+            } elseif ($applicationFavicon !== null) {
+                $this->setImage($this->assets->url($applicationFavicon));
+            }
         }
     }
 
@@ -514,8 +498,8 @@ class PageListener
                 ->setMetaTag('twitter:description', $seoMeta->twitter_description ?? $seoMeta->description);
         }
 
-        // Image
-        if ($seoMeta->open_graph_image) {
+        // Image — skip when ernestdefoe/og-image is active
+        if (!$this->ogImageActive && $seoMeta->open_graph_image) {
             $this
                 ->setMetaPropertyTag('og:image', $seoMeta->open_graph_image)
                 ->setMetaTag('twitter:image', $seoMeta->twitter_image ?? $seoMeta->open_graph_image)

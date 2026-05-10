@@ -1,15 +1,15 @@
 import Component from 'flarum/common/Component';
-import FieldSet from 'flarum/components/FieldSet';
-import Button from 'flarum/components/Button';
-import saveSettings from 'flarum/utils/saveSettings';
-import Switch from 'flarum/components/Switch';
-import UploadImageButton from 'flarum/components/UploadImageButton';
+import FieldSet from 'flarum/common/components/FieldSet';
+import Button from 'flarum/common/components/Button';
+import saveSettings from 'flarum/admin/utils/saveSettings';
+import Switch from 'flarum/common/components/Switch';
+import UploadImageButton from 'flarum/admin/components/UploadImageButton';
 import CrawlPostModal from "../Modals/CrawlPostModal";
 import RobotsModal from "../Modals/RobotsModal";
 import countKeywords from '../../utils/countKeywords';
-import Stream from 'flarum/utils/Stream';
+import Stream from 'flarum/common/utils/Stream';
 import DoFollowListModal from '../Modals/DoFollowListModal';
-import Select from 'flarum/components/Select';
+import Select from 'flarum/common/components/Select';
 import ItemList from 'flarum/common/utils/ItemList';
 
 export default class SeoSettings extends Component {
@@ -370,7 +370,7 @@ export default class SeoSettings extends Component {
               onclick: () =>
                 m.route.set(
                   app.route("extension", {
-                    id: "v17development-seo",
+                    id: "ernestdefoe-seo",
                   })
                 ),
             },

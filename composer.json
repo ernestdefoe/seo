@@ -1,20 +1,17 @@
 {
-  "name": "v17development/flarum-seo",
+  "name": "ernestdefoe/seo",
   "description": "Adds SEO tags for your Flarum forum",
   "type": "flarum-extension",
   "license": "MIT",
   "authors": [
     {
-      "name": "V17 Development",
-      "email": "info@v17.dev"
+      "name": "ernestdefoe"
     }
   ],
-  "homepage": "https://v17.dev/projects/flarum-seo",
+  "homepage": "https://github.com/ernestdefoe/seo",
   "support": {
-    "forum": "https://discuss.flarum.org/d/18316",
-    "issues": "https://github.com/v17development/flarum-seo/issues",
-    "source": "https://github.com/v17development/flarum-seo",
-    "docs": "https://community.v17.dev/knowledgebase/category/flarum-seo"
+    "issues": "https://github.com/ernestdefoe/seo/issues",
+    "source": "https://github.com/ernestdefoe/seo"
   },
   "autoload": {
     "psr-4": {
@@ -22,15 +19,15 @@
     }
   },
   "require": {
-    "php": "^8.0",
-    "flarum/core": "^1.0.0",
+    "php": "^8.1",
+    "flarum/core": "^2.0",
     "ext-json": "*"
   },
   "require-dev": {
-    "flarum/tags": "^1.8",
-    "fof/pages": "^1.0",
-    "fof/best-answer": "^1.6",
-    "flarum/phpstan": "^1.0"
+    "flarum/tags": "^2.0",
+    "fof/pages": "^2.0",
+    "fof/best-answer": "^2.0",
+    "flarum/phpstan": "^2.0"
   },
   "conflict": {
     "zerosonesfun/elint": "*",
@@ -41,19 +38,17 @@
   },
   "extra": {
     "flarum-extension": {
-      "title": "SEO",
+      "title": "Ernestdefoe SEO",
       "category": "feature",
       "optional-dependencies": [
-        "flarum/tags"
+        "flarum/tags",
+        "ernestdefoe/og-image"
       ],
       "icon": {
         "name": "fas fa-check",
         "backgroundColor": "#0072ff",
         "color": "#ffffff"
       }
-    },
-    "flagrow": {
-      "discuss": "https://discuss.flarum.org/d/18316"
     }
   },
   "scripts": {
