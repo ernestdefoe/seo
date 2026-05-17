@@ -597,13 +597,22 @@ export default class MetaSeoModal extends Modal {
   returnFoFUploadButton(onSelect) {
     let fofUploadButton = null;
 
+    // fof/upload integration: resolved via flarum.reg at runtime so the
+    // webpack bundler doesn't need @fof-upload as a build-time dep.
+    // (Static `require("@fof-upload")` would break the build any time
+    // fof/upload isn't installed alongside this extension during
+    // bundling — but the extension MUST keep working in the
+    // overwhelmingly common case where fof/upload is absent.)
     if (
-      "fof-upload" in flarum.extensions &&
+      "fof-upload" in (window.flarum?.extensions || {}) &&
       app.forum.attribute("fof-upload.canUpload")
     ) {
-      const {
-        components: { Uploader, FileManagerModal },
-      } = require("@fof-upload");
+      const Uploader = flarum.reg.get("fof-upload", "components/Uploader");
+      const FileManagerModal = flarum.reg.get(
+        "fof-upload",
+        "components/FileManagerModal"
+      );
+      if (!Uploader || !FileManagerModal) return null;
 
       const uploader = new Uploader();
 

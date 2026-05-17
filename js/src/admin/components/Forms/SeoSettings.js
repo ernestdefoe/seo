@@ -3,7 +3,7 @@ import FieldSet from 'flarum/common/components/FieldSet';
 import Button from 'flarum/common/components/Button';
 import saveSettings from 'flarum/admin/utils/saveSettings';
 import Switch from 'flarum/common/components/Switch';
-import UploadImageButton from 'flarum/admin/components/UploadImageButton';
+import UploadImageButton from 'flarum/common/components/UploadImageButton';
 import CrawlPostModal from "../Modals/CrawlPostModal";
 import RobotsModal from "../Modals/RobotsModal";
 import countKeywords from '../../utils/countKeywords';
@@ -200,7 +200,16 @@ export default class SeoSettings extends Component {
             your website (Facebook, Twitter, Reddit).
           </div>,
           UploadImageButton.component({
+            // Flarum 2's UploadImageButton derives the upload URL from
+            // `routePath` (joined to apiUrl) rather than reusing `name`
+            // as v1 did. Both POST (upload) and DELETE (remove) hit
+            // /api/seo_social_media_image — see extend.php route
+            // registrations under `seo.socialmedia.*`. `name` is still
+            // required so the IMG tag's alt + preview lookup work.
             name: "seo_social_media_image",
+            routePath: "seo_social_media_image",
+            value: () => app.data.settings.seo_social_media_image_url,
+            url: () => app.data.settings.seo_social_media_image_url,
           }),
         ]
       ),
