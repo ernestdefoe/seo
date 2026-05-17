@@ -2,34 +2,49 @@
 
 namespace V17Development\FlarumSeo\Api\Controllers;
 
+use Flarum\Http\RequestUtil;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Filesystem\Cloud;
-use Psr\Http\Message\ServerRequestInterface;
 use Laminas\Diactoros\Response\EmptyResponse;
-use Flarum\Api\Controller\AbstractDeleteController;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
-class DeleteSocialMediaImageController extends AbstractDeleteController
+/**
+ * Deletes the admin-uploaded fallback social-media image and clears both
+ * the storage-relative path and the public URL from settings.
+ *
+ * Flarum 2: was AbstractDeleteController in v1; that class no longer
+ * exists. Plain RequestHandlerInterface controller is the v2 shape for
+ * non-CRUD mutations.
+ */
+class DeleteSocialMediaImageController implements RequestHandlerInterface
 {
-    protected SettingsRepositoryInterface $settings;
     protected Cloud $disk;
 
-    public function __construct(SettingsRepositoryInterface $settings, Container $container)
-    {
-        $this->settings = $settings;
+    public function __construct(
+        protected SettingsRepositoryInterface $settings,
+        Container $container,
+    ) {
         $this->disk = $container->make('filesystem')->disk('flarum-assets');
     }
 
-    protected function delete(ServerRequestInterface $request)
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $request->getAttribute('actor')->assertAdmin();
+        RequestUtil::getActor($request)->assertAdmin();
 
         $path = $this->settings->get('seo_social_media_image_path');
         $this->settings->set('seo_social_media_image_path', null);
         $this->settings->set('seo_social_media_image_url', null);
 
-        if ($this->disk->exists($path)) {
-            $this->disk->delete($path);
+        if ($path && $this->disk->exists($path)) {
+            try {
+                $this->disk->delete($path);
+            } catch (\Throwable) {
+                /* Path was cleared from settings already; orphan blob is
+                 * a known-tolerable cleanup miss. */
+            }
         }
 
         return new EmptyResponse(204);

@@ -44,7 +44,7 @@ class SEO implements ExtenderInterface
      *
      * @param
      */
-    public function extend(Container $container, Extension $extension = null)
+    public function extend(Container $container, ?Extension $extension = null): void
     {
         $container->resolving(PageManager::class, function ($page) use ($container) {
             foreach ($this->extenders as $name => $extender) {

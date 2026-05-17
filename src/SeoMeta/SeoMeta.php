@@ -59,9 +59,21 @@ class SeoMeta extends AbstractModel
     ];
 
     /**
-     * {@inheritdoc}
+     * Laravel 9+ (which Flarum 2 ships) deprecated `$dates` in favor of
+     * `$casts` for datetime hydration. Without this, raw column values
+     * come out of Eloquent as strings — and any `->toIso8601String()`
+     * call downstream throws "method on string".
      */
-    protected $dates = ['created_at', 'updated_at'];
+    protected $casts = [
+        'created_at'       => 'datetime',
+        'updated_at'       => 'datetime',
+        'auto_update_data' => 'boolean',
+        'robots_noindex'   => 'boolean',
+        'robots_nofollow'  => 'boolean',
+        'robots_noarchive' => 'boolean',
+        'robots_noimageindex' => 'boolean',
+        'robots_nosnippet' => 'boolean',
+    ];
 
     public static function build(string $objectType, int $objectId, bool $autoUpdate = true)
     {
