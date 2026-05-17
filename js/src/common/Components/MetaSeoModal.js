@@ -1,4 +1,4 @@
-import Modal from "flarum/common/components/Modal";
+import FormModal from "flarum/common/components/FormModal";
 import Button from "flarum/common/components/Button";
 import Switch from "flarum/common/components/Switch";
 import Stream from "flarum/common/utils/Stream";
@@ -8,7 +8,10 @@ import FieldSet from "flarum/common/components/FieldSet";
 import countKeywords from "../../admin/utils/countKeywords";
 import clsx from "clsx";
 
-export default class MetaSeoModal extends Modal {
+// Flarum 2 split Modal: bare Modal no longer wraps its body in <form>,
+// so onsubmit + <Button type="submit"> are dead. FormModal restores
+// the form wrapper. className() is already implemented below.
+export default class MetaSeoModal extends FormModal {
   initialized = true;
   initialLoading = false;
 

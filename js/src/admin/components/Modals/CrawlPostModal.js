@@ -1,9 +1,14 @@
-import Modal from 'flarum/common/components/Modal';
+import FormModal from 'flarum/common/components/FormModal';
 import Button from 'flarum/common/components/Button';
 import Switch from 'flarum/common/components/Switch';
 import saveSettings from 'flarum/admin/utils/saveSettings';
 
-export default class CrawlPostModal extends Modal {
+// Flarum 2 split Modal: the bare `Modal` no longer wraps its body in
+// <form>, so `onsubmit` + `<Button type="submit">` are dead. Anything
+// that submits needs the `FormModal` subclass, which restores the
+// onsubmit-fed <form> wrapper. `className()` also became abstract —
+// must implement or the modal renders without its identifying class.
+export default class CrawlPostModal extends FormModal {
   oninit(vnode) {
     super.oninit(vnode);
 
@@ -15,6 +20,10 @@ export default class CrawlPostModal extends Modal {
     if(typeof app.data.settings.seo_reviewed_post_crawler === "undefined") {
       this.saveReviewedPostCrawler();
     }
+  }
+
+  className() {
+    return 'Modal--medium CrawlPostModal';
   }
 
   title() {

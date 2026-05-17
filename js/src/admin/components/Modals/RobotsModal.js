@@ -1,8 +1,10 @@
-import Modal from 'flarum/common/components/Modal';
+import FormModal from 'flarum/common/components/FormModal';
 import Button from 'flarum/common/components/Button';
 import saveSettings from 'flarum/admin/utils/saveSettings';
 
-export default class RobotsModal extends Modal {
+// See CrawlPostModal for why this extends FormModal (form wrapper) and
+// must implement className() (now abstract on Modal in Flarum 2).
+export default class RobotsModal extends FormModal {
   oninit(vnode) {
     super.oninit(vnode);
 
@@ -11,6 +13,10 @@ export default class RobotsModal extends Modal {
 
     this.closeText = 'Close';
     this.loading = false;
+  }
+
+  className() {
+    return 'Modal--medium RobotsModal';
   }
 
   title() {

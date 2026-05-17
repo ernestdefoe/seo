@@ -1,9 +1,11 @@
-import Modal from 'flarum/common/components/Modal';
+import FormModal from 'flarum/common/components/FormModal';
 import Button from 'flarum/common/components/Button';
 import saveSettings from 'flarum/admin/utils/saveSettings';
 import Stream from 'flarum/common/utils/Stream';
 
-export default class DoFollowListModal extends Modal {
+// See CrawlPostModal for why this extends FormModal (form wrapper) and
+// must implement className() (now abstract on Modal in Flarum 2).
+export default class DoFollowListModal extends FormModal {
   oninit(vnode) {
     super.oninit(vnode);
 
@@ -18,6 +20,10 @@ export default class DoFollowListModal extends Modal {
 
     this.hasChanges = false;
     this.loading = false;
+  }
+
+  className() {
+    return 'Modal--medium DoFollowListModal';
   }
 
   title() {
