@@ -1,6 +1,7 @@
 {
   "name": "ernestdefoe/seo",
-  "description": "Adds SEO tags for your Flarum forum",
+  "description": "SEO meta tags, OpenGraph, Twitter Cards, JSON-LD structured data, bundled sitemap.xml generator, and search-console verification for Flarum 2.",
+  "keywords": ["flarum", "flarum-extension", "seo", "sitemap", "opengraph", "schema.org", "json-ld"],
   "type": "flarum-extension",
   "license": "MIT",
   "authors": [
@@ -38,7 +39,7 @@
   },
   "extra": {
     "flarum-extension": {
-      "title": "Ernestdefoe SEO",
+      "title": "SEO for Flarum 2",
       "category": "feature",
       "optional-dependencies": [
         "flarum/tags",

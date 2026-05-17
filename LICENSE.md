@@ -1,6 +1,7 @@
 MIT License
 
 Copyright (c) 2019 V17 Development
+Copyright (c) 2026 Ernest DeFoe (Flarum 2 fork + bundled sitemap, search-console verification, hardened upload pipeline)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
