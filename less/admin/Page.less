@@ -11,7 +11,12 @@
   }
 
   .seo-menu {
-    background: @control-bg;
+    // Flarum 2 exposes its theme colors as CSS custom properties
+    // (var(--control-bg)) rather than LESS variables. Upstream used
+    // @control-bg which compiles to nothing in v2 and aborts the LESS
+    // compiler with "variable @control-bg is undefined" — taking out
+    // the entire admin panel render.
+    background: var(--control-bg);
     margin-bottom: 15px;
 
 
@@ -20,7 +25,11 @@
       border-radius: 0;
 
       &.item-selected {
-        background: darken(@control-bg, 10%);
+        // CSS custom properties can't be passed to LESS's darken()
+        // function (LESS only operates on LESS-time values). The
+        // closest v2-friendly equivalent is the shaded variant Flarum
+        // ships for exactly this case.
+        background: var(--control-bg-shaded);
       }
     }
   }
