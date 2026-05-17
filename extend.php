@@ -10,11 +10,12 @@ use Flarum\Database\AbstractModel;
 use Flarum\Discussion\Discussion as FlarumDiscussion;
 use Flarum\Extend;
 use V17Development\FlarumSeo\Api\Controllers\DeleteSocialMediaImageController;
-use V17Development\FlarumSeo\Api\Controllers\ShowSeoMetaByObjectController;
 use V17Development\FlarumSeo\Api\Controllers\UploadSocialMediaImageController;
 use V17Development\FlarumSeo\Api\Resource\SeoMetaResource;
 use V17Development\FlarumSeo\ConfigureLinks;
+use V17Development\FlarumSeo\Content\SearchEngineVerification;
 use V17Development\FlarumSeo\Controller\Robots;
+use V17Development\FlarumSeo\Sitemap\SitemapController;
 use V17Development\FlarumSeo\Formatter\FormatLinks;
 use V17Development\FlarumSeo\Extend\SEO;
 use V17Development\FlarumSeo\Listeners\PageListener;
@@ -53,6 +54,7 @@ if (class_exists(\Flarum\Tags\Tag::class)) {
 return [
     (new Extend\Frontend('forum'))
         ->content(PageListener::class)
+        ->content(SearchEngineVerification::class)
         ->js(__DIR__ . '/js/dist/forum.js')
         ->css(__DIR__ . '/less/Forum.less'),
 
@@ -63,14 +65,24 @@ return [
     new Extend\Locales(__DIR__ . '/locale'),
 
     (new Extend\Routes('forum'))
-        ->get('/robots.txt', 'ernestdefoe-seo.robots', Robots::class),
+        ->get('/robots.txt', 'ernestdefoe-seo.robots', Robots::class)
+        // Bundled sitemap.xml generator. When fof/sitemap is also
+        // installed, SitemapController auto-detects it and 404s so the
+        // upstream extension owns the route — no double-serving, no
+        // ordering hazard. Single-file sitemap capped at 50k URLs;
+        // for larger forums, install fof/sitemap for sitemap-index
+        // pagination.
+        ->get('/sitemap.xml', 'ernestdefoe-seo.sitemap', SitemapController::class),
 
     (new Extend\Routes('api'))
         ->post('/seo_social_media_image', 'seo.socialmedia.upload', UploadSocialMediaImageController::class)
-        ->delete('/seo_social_media_image', 'seo.socialmedia.delete', DeleteSocialMediaImageController::class)
-        // Polymorphic find-or-create lookup — admin opens the SEO drawer
-        // for a discussion/tag/page that doesn't yet have a SeoMeta row.
-        ->get('/seo_meta/by-object/{object_type}/{id:\d+}', 'seo_meta.by_object', ShowSeoMetaByObjectController::class),
+        ->delete('/seo_social_media_image', 'seo.socialmedia.delete', DeleteSocialMediaImageController::class),
+    // Note: the v1 polymorphic find-or-create endpoint
+    // `/seo_meta/{object_type}-{id}` is now handled INLINE by
+    // SeoMetaResource::find() — when the URL segment looks like
+    // `discussions-42`, find() short-circuits to
+    // SeoMeta::findByObjectTypeOrCreate. JSON:API resource auto-routes
+    // mount this at /api/seo_meta/discussions-42 cleanly.
 
     (new Extend\Formatter())
         ->render(FormatLinks::class)
@@ -104,8 +116,15 @@ return [
      */
     (new Extend\ApiResource(DiscussionResource::class))
         ->fields(fn () => [
+            // Type string must match SeoMetaResource::type() — kept as
+            // 'seo_meta' (underscore) for backward-compat with the
+            // pre-rewritten admin JS bundle. Wrong type here triggers
+            // the §46 polymorphic-type-mismatch class of crash:
+            // typesForModels returns null for an unregistered type and
+            // JSON:API's getCollection() rejects with a TypeError that
+            // surfaces as a generic 404.
             Schema\Relationship\ToOne::make('seoMeta')
-                ->type('seoMeta')
+                ->type('seo_meta')
                 ->includable(),
         ])
         ->endpoint(Endpoint\Show::class, fn (Endpoint\Show $endpoint) => $endpoint->eagerLoad('seoMeta'))

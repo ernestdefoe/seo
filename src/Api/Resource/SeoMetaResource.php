@@ -12,6 +12,14 @@ use Tobyz\JsonApiServer\Context as BaseContext;
 use V17Development\FlarumSeo\SeoMeta\SeoMeta;
 
 /**
+ * Object types the frontend is allowed to lazy-create SeoMeta rows for
+ * via the dash-separated find-or-create lookup. Hard-coded to the
+ * known subjects so the route can't be abused to spam rows for
+ * arbitrary string types.
+ */
+const SEOMETA_ALLOWED_OBJECT_TYPES = ['discussions', 'users', 'tags', 'pages'];
+
+/**
  * Flarum 2 JSON:API Resource replacing the v1 ListSeoMetaController +
  * ShowSeoMetaController + UpdateSeoMetaController + SeoMetaSerializer
  * quartet. Same external endpoints, same wire format, idiomatic v2
@@ -35,12 +43,45 @@ class SeoMetaResource extends AbstractDatabaseResource
 {
     public function type(): string
     {
-        return 'seoMeta';
+        // Match the v1 wire format the existing admin JS bundle expects
+        // (app.store.find('seo_meta', ...) + GET /api/seo_meta/...).
+        // JSON:API allows any non-empty string as type — underscore is
+        // unusual but valid, and keeping it preserves backward compat
+        // with the bundled admin frontend without a bundle rebuild.
+        return 'seo_meta';
     }
 
     public function model(): string
     {
         return SeoMeta::class;
+    }
+
+    /**
+     * Override find() to support the dash-separated polymorphic lookup
+     * the admin frontend uses: `GET /api/seo_meta/discussions-42` —
+     * which means "find-or-create the SeoMeta row for discussion 42".
+     * Numeric ids fall through to the standard primary-key lookup.
+     *
+     * Authorization is enforced inline because the find-or-create
+     * branch creates a row as a side effect of a GET — same security
+     * stance the v1 ShowSeoMetaController had.
+     */
+    public function find(string $id, BaseContext $context): ?object
+    {
+        if (preg_match('/^([a-z_]+)-(\d+)$/', $id, $m)) {
+            $actor = RequestUtil::getActor($context->request);
+            $actor->assertCan('seo.canConfigure');
+
+            $objectType = $m[1];
+            $objectId   = (int) $m[2];
+
+            if (! in_array($objectType, SEOMETA_ALLOWED_OBJECT_TYPES, true)) {
+                return null;
+            }
+            return SeoMeta::findByObjectTypeOrCreate($objectType, $objectId);
+        }
+
+        return parent::find($id, $context);
     }
 
     public function scope(Builder $query, BaseContext $context): void
