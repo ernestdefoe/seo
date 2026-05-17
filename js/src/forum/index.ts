@@ -1,6 +1,6 @@
 import app from "flarum/forum/app";
 import DiscussionControls from "flarum/forum/utils/DiscussionControls";
-import Button from "flarum/forum/components/Button";
+import Button from "flarum/common/components/Button";
 import { extend } from "flarum/common/extend";
 import MetaSeoModal from "../common/Components/MetaSeoModal";
 import SeoMeta from "../common/Models/SeoMeta";
