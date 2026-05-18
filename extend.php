@@ -51,6 +51,38 @@ if (class_exists(\Flarum\Tags\Tag::class)) {
     $events->subscribe(Subscribers\TagSubscriber::class);
 }
 
+/**
+ * Forum routes — /robots.txt and /sitemap.xml ONLY when fof/sitemap is
+ * not installed.
+ *
+ * fof/sitemap registers the same two routes (plus /sitemap-{id}.xml for
+ * paginated sets) in its own extend.php. Both extensions registering
+ * GET /robots.txt makes FastRoute throw
+ *   `Cannot register two routes matching "/robots.txt" for method "GET"`
+ * at boot, before either controller ever runs — the whole forum 500s.
+ * fof/sitemap's extend.php DOES try to delete the conflicting routes by
+ * name, but it targets the upstream v17development route names
+ * (`flarum-seo.robots`, `flarum-seo.sitemap`); this fork renamed them to
+ * `ernestdefoe-seo.*` for vendor isolation, so the cleanup misses them
+ * and the crash hits.
+ *
+ * `class_exists` is the right gate here: composer autoloading is
+ * resolved by the time extend.php is read, but the extension manager's
+ * enabled-list isn't necessarily — and we want to defer regardless of
+ * whether fof/sitemap is currently *enabled*, since route registration
+ * happens unconditionally for every installed extension.
+ *
+ * SitemapController still has a runtime `class_exists(\FoF\Sitemap\...)`
+ * 404 fallback as defense-in-depth, but the real fix lives here.
+ */
+$routes = new Extend\Routes('forum');
+
+if (! class_exists(\FoF\Sitemap\Sitemap::class)) {
+    $routes
+        ->get('/robots.txt', 'ernestdefoe-seo.robots', Robots::class)
+        ->get('/sitemap.xml', 'ernestdefoe-seo.sitemap', SitemapController::class);
+}
+
 return [
     (new Extend\Frontend('forum'))
         ->content(PageListener::class)
@@ -64,15 +96,7 @@ return [
 
     new Extend\Locales(__DIR__ . '/locale'),
 
-    (new Extend\Routes('forum'))
-        ->get('/robots.txt', 'ernestdefoe-seo.robots', Robots::class)
-        // Bundled sitemap.xml generator. When fof/sitemap is also
-        // installed, SitemapController auto-detects it and 404s so the
-        // upstream extension owns the route — no double-serving, no
-        // ordering hazard. Single-file sitemap capped at 50k URLs;
-        // for larger forums, install fof/sitemap for sitemap-index
-        // pagination.
-        ->get('/sitemap.xml', 'ernestdefoe-seo.sitemap', SitemapController::class),
+    $routes,
 
     (new Extend\Routes('api'))
         ->post('/seo_social_media_image', 'seo.socialmedia.upload', UploadSocialMediaImageController::class)
