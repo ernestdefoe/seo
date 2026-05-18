@@ -152,20 +152,30 @@ export default class HealthCheck extends Page {
   // Review bot settings
   hasSitemap()
   {
-    let passed = true;
+    // This fork ships a bundled SitemapController that serves /sitemap.xml
+    // when no upstream sitemap extension is installed. The check passes if
+    // ANY sitemap is being served:
+    //   - flagrow-sitemap (legacy) or fof-sitemap is enabled, OR
+    //   - the admin hasn't explicitly turned off our bundled one.
+    const enabled = app.data.settings.extensions_enabled || '[]';
+    let extList = [];
+    try { extList = JSON.parse(enabled); } catch (e) {}
 
-    if(app.data.settings.extensions_enabled.indexOf('flagrow-sitemap') === -1 && app.data.settings.extensions_enabled.indexOf('fof-sitemap') === -1) {
-      passed = false;
-    }
+    const upstreamActive = extList.indexOf('flagrow-sitemap') !== -1
+                       || extList.indexOf('fof-sitemap') !== -1;
+    const bundledActive = !upstreamActive
+                       && app.data.settings.seo_sitemap_mode !== 'off';
+
+    const passed = upstreamActive || bundledActive;
 
     return (
       <tr>
         <td>
           Your forum has a sitemap available
           {this.notPassedError(
-            passed, 
-            'It is highly recommended to install the FriendsOfFlarum sitemap extension!', 
-            'Read more about adding a sitemap',
+            passed,
+            'No sitemap is being served. Either install FoF Sitemap, or re-enable this extension\'s bundled sitemap.',
+            'Open sitemap settings',
             app.route('extension', {
               id: 'ernestdefoe-seo',
               page: 'sitemap'

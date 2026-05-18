@@ -68,6 +68,14 @@ class SitemapController implements RequestHandlerInterface
                 return new TextResponse('Not found', 404, ['Content-Type' => 'text/plain']);
             }
 
+            // Admin can explicitly opt out via the Sitemap settings page
+            // (mode='off'). They picked this — typically because they handle
+            // /sitemap.xml via CDN/static file, or plan to install
+            // fof/sitemap. 404 cleanly instead of generating wasted output.
+            if ($this->settings->get('seo_sitemap_mode') === 'off') {
+                return new TextResponse('Not found', 404, ['Content-Type' => 'text/plain']);
+            }
+
             $xml = $this->cache->remember(
                 'ernestdefoe-seo.sitemap.xml.guest',
                 self::CACHE_TTL,
