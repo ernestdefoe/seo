@@ -14,7 +14,10 @@ use V17Development\FlarumSeo\SeoProperties;
  */
 class TagSubscriber
 {
-    public function __construct(private SeoProperties $seoProperties) {}
+    public function __construct(
+        private SeoProperties $seoProperties,
+        private TranslatorInterface $translator,
+    ) {}
 
     /**
      * Subscribe function
@@ -74,8 +77,14 @@ class TagSubscriber
         // Only update meta data if object type matches
         if ($event->objectType !== 'tags') return;
 
-        // Find tag
+        // Find tag. May be null if the tag was deleted between the
+        // SeoMeta creation event and this listener firing — same
+        // race that DiscussionSubscriber::onMetaCreated guards
+        // against. updateMeta() dereferences ->name, ->created_at,
+        // ->last_posted_at, ->description on this value, which
+        // would TypeError on null and bubble up as a 500.
         $tag = Tag::find($event->objectId);
+        if ($tag === null) return;
 
         $this->updateMeta($event->seoMeta, $tag);
 
@@ -94,7 +103,7 @@ class TagSubscriber
         $meta->updated_at = $tag->last_posted_at;
 
         // Set discussion description and image
-        $description = $tag->description ?? resolve(TranslatorInterface::class)->trans('flarum-tags.forum.tag.meta_description_text', ['{tag}' => $tag->name]);
+        $description = $tag->description ?? $this->translator->trans('flarum-tags.forum.tag.meta_description_text', ['{tag}' => $tag->name]);
 
         // Get Tag description
         $meta->description = $this->seoProperties->generateDescriptionFromContent($description);

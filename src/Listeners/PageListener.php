@@ -188,13 +188,33 @@ class PageListener
 
         $show[] = $this->addSearchBar();
 
-        // `true` was being coerced to int 1 = JSON_HEX_TAG, which
-        // Unicode-escaped every `<` and `>` in the LD+JSON output and
-        // also kept Unicode escapes on every accented or CJK
-        // character in titles. The correct flag set keeps the JSON
-        // human-readable AND search-engine-readable.
+        // History note: the original code used `json_encode($show, true)`.
+        // PHP coerces `true` to int 1, which silently happens to equal
+        // `JSON_HEX_TAG`. A previous "fix" replaced `true` with
+        // `JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES` and dropped
+        // `JSON_HEX_TAG` — that change made the LD+JSON Unicode- and
+        // slash-friendly but RE-INTRODUCED a stored XSS: an actor who
+        // creates a discussion (or tag) titled
+        // `</script><script>alert(1)</script>` lands their payload in
+        // `seo_meta.title`, which gets serialised into the LD+JSON
+        // block on every subsequent page view. The browser's HTML
+        // parser doesn't care that we're inside a `<script>` element
+        // — `</script>` inside a JSON string still terminates the
+        // script tag and the next `<script>` runs.
+        //
+        // `JSON_HEX_TAG` encodes `<` as `<` and `>` as `>`
+        // inside string values. JSON parsers (including Google's
+        // structured-data crawler) decode the escape transparently,
+        // so search engines see the same content while the HTML
+        // parser sees no `</script>` token. Keep this flag combined
+        // with the unicode + slash flags from before — the
+        // human-readability win was the original intent and is
+        // unaffected by the breakout-safe escaping.
         return '<script type="application/ld+json">'
-            . json_encode($show, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+            . json_encode(
+                $show,
+                JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG
+            )
             . '</script>';
     }
 

@@ -35,12 +35,24 @@ class PostSubscriber
      */
     public function onModelEvent($event)
     {
+        // The discussion relationship is lazy-loaded and can be null on
+        // an orphaned post — one whose parent Discussion row was
+        // hard-deleted while the Post row survives (rare, but happens
+        // in dev fixtures, in partial database restores, and when a
+        // moderation tool deletes the discussion without cascading
+        // posts). Passing null into findOneByModel reaches getTable()
+        // / getKey() on null and surfaces as a 500 for whichever event
+        // (Post\Posted, Post\Revised, Post\Deleting) fired for the
+        // orphan. Bail cleanly instead.
+        $discussion = $event->post->discussion;
+        if ($discussion === null) return;
+
         // Find meta
-        $meta = SeoMeta::findOneByModel($event->post->discussion);
+        $meta = SeoMeta::findOneByModel($discussion);
 
         // Create new meta by model
         if (!$meta) {
-            $meta = SeoMeta::buildByModel($event->post->discussion);
+            $meta = SeoMeta::buildByModel($discussion);
         }
 
         // Do not auto update
@@ -48,7 +60,7 @@ class PostSubscriber
             return;
         }
 
-        $this->discussionSubscriber->updateMeta($meta, $event->post->discussion);
+        $this->discussionSubscriber->updateMeta($meta, $discussion);
 
         // Update
         $meta->save();

@@ -227,25 +227,52 @@ class SeoMeta extends AbstractModel
      */
     public static function findByModelOrCreate(Model $model, array|callable $fillables = []): Model
     {
-        // Is an array with defaults
+        $objectType = $model->getTable();
+        $objectId   = $model->getKey();
+
+        // Array-defaults path: firstOrCreate is atomic on the (type, id)
+        // unique index, so the race is already handled by the DB layer.
         if (!is_callable($fillables)) {
             return self::firstOrCreate([
-                'object_type' => $model->getTable(),
-                'object_id' => $model->getKey()
+                'object_type' => $objectType,
+                'object_id'   => $objectId,
             ], $fillables);
         }
 
-        return self::where([
-            'object_type' => $model->getTable(),
-            'object_id' => $model->getKey()
-        ])->firstOr(function () use ($model, $fillables): Model {
-            $data = SeoMeta::build($model->getTable(), $model->getKey());
+        // Callable path: same shape as findByObjectTypeOrCreate — SELECT,
+        // then INSERT on miss, then catch the unique-index collision that
+        // happens when two concurrent first-time requests for the same
+        // model (e.g. two bots hitting a tag page) both pass the SELECT
+        // and both attempt the INSERT. Without this guard, the loser
+        // surfaces a 500 because the closure inside firstOr() has no
+        // catch block.
+        $existing = self::where([
+            'object_type' => $objectType,
+            'object_id'   => $objectId,
+        ])->first();
 
-            $fillables($data);
+        if ($existing !== null) {
+            return $existing;
+        }
 
+        $data = SeoMeta::build($objectType, $objectId);
+        $fillables($data);
+
+        try {
             $data->save();
-
             return $data;
-        });
+        } catch (QueryException $e) {
+            if ((string) $e->getCode() !== '23000') {
+                throw $e;
+            }
+            $winner = self::where([
+                'object_type' => $objectType,
+                'object_id'   => $objectId,
+            ])->first();
+            if ($winner !== null) {
+                return $winner;
+            }
+            throw $e;
+        }
     }
 }
