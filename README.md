@@ -1,5 +1,11 @@
 # SEO for Flarum 2
 
+[![Floxum](https://floxum.com/extension/ernestdefoe/seo/badge/name)](https://floxum.com/extension/ernestdefoe/seo)
+[![Version](https://floxum.com/extension/ernestdefoe/seo/badge/highest-version)](https://floxum.com/extension/ernestdefoe/seo)
+[![Downloads](https://floxum.com/extension/ernestdefoe/seo/badge/downloads)](https://floxum.com/extension/ernestdefoe/seo)
+[![Review](https://floxum.com/extension/ernestdefoe/seo/badge/review)](https://floxum.com/extension/ernestdefoe/seo)
+[![License](https://floxum.com/extension/ernestdefoe/seo/badge/license)](https://floxum.com/extension/ernestdefoe/seo)
+
 [![Flarum 2.0](https://img.shields.io/badge/Flarum-%5E2.0-orange)](https://flarum.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE.md)
 
