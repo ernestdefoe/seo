@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Flarum\Database\AbstractModel;
 use Flarum\Foundation\EventGeneratorTrait;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\QueryException;
 use V17Development\FlarumSeo\SeoMeta\Event\Created;
 
 /**
@@ -137,31 +138,48 @@ class SeoMeta extends AbstractModel
      */
     public static function findByObjectTypeOrCreate(string $objectType, int $objectId, callable|null $fillables = null): Model
     {
-        $query = self::where([
+        $existing = self::where([
             ['object_type', '=', $objectType],
             ['object_id', '=', $objectId]
-        ]);
+        ])->first();
 
-        // No fillables
-        if ($fillables === null) {
-            return $query->firstOr(function () use ($objectType, $objectId): Model {
-                $data = SeoMeta::build($objectType, $objectId);
-
-                $data->save();
-
-                return $data;
-            });
+        if ($existing !== null) {
+            return $existing;
         }
 
-        return $query->firstOr(function () use ($objectType, $objectId, $fillables): Model {
-            $data = SeoMeta::build($objectType, $objectId);
+        $data = SeoMeta::build($objectType, $objectId);
 
+        if ($fillables !== null) {
             $fillables($data);
+        }
 
+        // Race condition: under concurrent page loads for the same new
+        // discussion (or any new object), two requests can both pass
+        // the SELECT above and both attempt the INSERT below — the
+        // second request hits the (object_type, object_id) unique
+        // index and throws a QueryException with SQLSTATE 23000. We
+        // catch only that specific class of error, re-run the SELECT
+        // to return the winning row, and let any other DB error
+        // surface normally. The "Created" event fires only for the
+        // request that actually inserted, which is the desired
+        // semantics — we don't want two duplicate created-events
+        // firing for the same row.
+        try {
             $data->save();
-
             return $data;
-        });
+        } catch (QueryException $e) {
+            if ((string) $e->getCode() !== '23000') {
+                throw $e;
+            }
+            $winner = self::where([
+                ['object_type', '=', $objectType],
+                ['object_id', '=', $objectId]
+            ])->first();
+            if ($winner !== null) {
+                return $winner;
+            }
+            throw $e;
+        }
     }
 
     /**

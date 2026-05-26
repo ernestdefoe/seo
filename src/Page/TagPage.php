@@ -21,14 +21,18 @@ class TagPage implements PageDriverInterface
     protected $translator;
 
     /**
-     * @param TagRepository $tagRepository
+     * @var TagRepository
      */
+    protected $tagRepository;
+
     public function __construct(
         TranslatorInterface $translator,
-        Dispatcher $events
+        Dispatcher $events,
+        TagRepository $tagRepository
     ) {
         $this->events = $events;
         $this->translator = $translator;
+        $this->tagRepository = $tagRepository;
     }
 
     public function extensionDependencies(): array
@@ -52,11 +56,11 @@ class TagPage implements PageDriverInterface
 
         // I do support it, but it didn't work
         if (!is_numeric($tagId)) {
-            $tagId = resolve(TagRepository::class)->getIdForSlug($tagId);
+            $tagId = $this->tagRepository->getIdForSlug($tagId);
         }
 
         try {
-            $tag = resolve(TagRepository::class)->findOrFail($tagId);
+            $tag = $this->tagRepository->findOrFail($tagId);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             // Do nothing, no model found
             return;

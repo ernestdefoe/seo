@@ -188,7 +188,14 @@ class PageListener
 
         $show[] = $this->addSearchBar();
 
-        return '<script type="application/ld+json">' . json_encode($show, true) . '</script>';
+        // `true` was being coerced to int 1 = JSON_HEX_TAG, which
+        // Unicode-escaped every `<` and `>` in the LD+JSON output and
+        // also kept Unicode escapes on every accented or CJK
+        // character in titles. The correct flag set keeps the JSON
+        // human-readable AND search-engine-readable.
+        return '<script type="application/ld+json">'
+            . json_encode($show, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+            . '</script>';
     }
 
     /**

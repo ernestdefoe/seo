@@ -74,8 +74,14 @@ class DiscussionSubscriber
         // Only update meta data if object type matches
         if ($event->objectType !== 'discussions') return;
 
-        // Find discussion
+        // Find discussion. May be null if the discussion was deleted
+        // between the SeoMeta creation event and this listener firing
+        // (or in tests that build a SeoMeta without a real
+        // Discussion row). updateMeta() dereferences ->title,
+        // ->created_at, ->firstPost etc., which would TypeError on
+        // null and bubble up as a 500 — silently bail out instead.
         $discussion = Discussion::find($event->objectId);
+        if ($discussion === null) return;
 
         $this->updateMeta($event->seoMeta, $discussion);
 
