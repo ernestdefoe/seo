@@ -101,6 +101,7 @@ ernestdefoe-seo:
 
       alerts:
         saved: "Saved!"
+        save_error: "Could not save SEO settings. Please try again or check the server log."
 
   forum:
     profile_title: "Profile of {username}"

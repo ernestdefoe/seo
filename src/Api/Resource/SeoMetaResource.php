@@ -12,14 +12,6 @@ use Tobyz\JsonApiServer\Context as BaseContext;
 use V17Development\FlarumSeo\SeoMeta\SeoMeta;
 
 /**
- * Object types the frontend is allowed to lazy-create SeoMeta rows for
- * via the dash-separated find-or-create lookup. Hard-coded to the
- * known subjects so the route can't be abused to spam rows for
- * arbitrary string types.
- */
-const SEOMETA_ALLOWED_OBJECT_TYPES = ['discussions', 'users', 'tags', 'pages'];
-
-/**
  * Flarum 2 JSON:API Resource replacing the v1 ListSeoMetaController +
  * ShowSeoMetaController + UpdateSeoMetaController + SeoMetaSerializer
  * quartet. Same external endpoints, same wire format, idiomatic v2
@@ -41,6 +33,14 @@ const SEOMETA_ALLOWED_OBJECT_TYPES = ['discussions', 'users', 'tags', 'pages'];
  */
 class SeoMetaResource extends AbstractDatabaseResource
 {
+    /**
+     * Object types the frontend is allowed to lazy-create SeoMeta rows
+     * for via the dash-separated find-or-create lookup. Hard-coded to
+     * the known subjects so the route can't be abused to spam rows for
+     * arbitrary string types.
+     */
+    public const ALLOWED_OBJECT_TYPES = ['discussions', 'users', 'tags', 'pages'];
+
     public function type(): string
     {
         // Match the v1 wire format the existing admin JS bundle expects
@@ -75,7 +75,7 @@ class SeoMetaResource extends AbstractDatabaseResource
             $objectType = $m[1];
             $objectId   = (int) $m[2];
 
-            if (! in_array($objectType, SEOMETA_ALLOWED_OBJECT_TYPES, true)) {
+            if (! in_array($objectType, self::ALLOWED_OBJECT_TYPES, true)) {
                 return null;
             }
             return SeoMeta::findByObjectTypeOrCreate($objectType, $objectId);

@@ -160,7 +160,15 @@ class DiscussionBestAnswerPage implements PageDriverInterface
         $mainEntity = [
             '@type' => 'Question',
             'name' => $seoMeta->title,
-            'text' => $firstPost !== null ? strip_tags($firstPost->content) : '',
+            // Use formatContent() to get the rendered HTML, not the
+            // raw TextFormatter XML stored in `posts.content`. The XML
+            // form leaves bbcode / mention / quote artifacts behind
+            // when stripped (raw `@username` text, stray `<s>`/`<e>`
+            // wrapper punctuation), and those land verbatim in the
+            // Schema.org payload that Google's structured-data crawler
+            // reads. DiscussionSubscriber.php already uses
+            // formatContent() for the same purpose; keep it consistent.
+            'text' => $firstPost !== null ? strip_tags($firstPost->formatContent()) : '',
             'dateCreated' => $seoMeta->created_at,
             'author' => [
                 "@type" => "Person",
@@ -183,10 +191,22 @@ class DiscussionBestAnswerPage implements PageDriverInterface
         // Only add suggested answers property if there are posts
         $mainEntity['suggestedAnswer'] = [];
 
-        // Get all public comments for this discussion
+        // Get all public comments for this discussion.
+        //
+        // Eager-load `user` so the per-post Schema.org author lookup
+        // (`$post->user->display_name` + URL) doesn't fire N+1 user
+        // queries; withCount('likes') gives us $post->likes_count as
+        // an aggregate column so we can read the upvoteCount without
+        // hydrating every Like row into memory. On a 200-reply Q&A
+        // page this avoids ~400 extra DB roundtrips per render — and
+        // this render is the one Google's structured-data crawler
+        // hits, so latency here is visible to ranking.
         /** @var Collection<Post> $posts */
         $posts = $discussion->posts()
-            ->where('number', '>', '1')->get();
+            ->with('user')
+            ->withCount('likes')
+            ->where('number', '>', '1')
+            ->get();
 
         foreach ($posts as $post) {
             /** @var Post $post */
@@ -194,10 +214,12 @@ class DiscussionBestAnswerPage implements PageDriverInterface
                 continue;
             }
 
-            // Temp post
+            // Temp post — same reasoning as firstPost above: render
+            // through formatContent() so mention/bbcode/quote nodes
+            // are resolved before strip_tags() runs.
             $generatedPost = [
                 '@type' => 'Answer',
-                'text' => strip_tags($post->content),
+                'text' => strip_tags($post->formatContent()),
                 'dateCreated' => $post->created_at->toIso8601String(),
                 'url' => $this->urlGenerator->to('forum')->route('discussion', ['id' => $discussion->id . '-' . $discussion->slug, 'near' => $post->number]),
                 'author' => [
@@ -207,8 +229,13 @@ class DiscussionBestAnswerPage implements PageDriverInterface
                 ]
             ];
 
-            // Upvote/like count
-            $generatedPost['upvoteCount'] = $enableLikes ? $post->likes->count() : 0;
+            // Upvote/like count — reads the aggregate `likes_count`
+            // column populated by `withCount('likes')` above instead
+            // of `$post->likes->count()` which hydrates the full
+            // collection. ?? 0 covers the case where flarum/likes is
+            // installed but the column wasn't loaded (e.g. a future
+            // refactor that drops the withCount).
+            $generatedPost['upvoteCount'] = $enableLikes ? (int) ($post->likes_count ?? 0) : 0;
 
             // Set accepted answer
             if ($bestAnswerId === $post->id) {

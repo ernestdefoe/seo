@@ -746,7 +746,18 @@ export default class MetaSeoModal extends FormModal {
         this.hide();
       })
       .catch((e) => {
-        console.log(e);
+        // Surface the failure. Previously the catch only did a
+        // `console.log(e)` and reset `saving`, so the admin clicked
+        // Save, received no feedback, and assumed the metadata had
+        // been written. Show the alert AND keep the modal open
+        // (don't `this.hide()`) so the operator can read the error
+        // and retry. The console.log is dropped — devtools-only
+        // error reporting from a production extension is a §40.2
+        // robustness finding.
+        const detail =
+          e?.response?.errors?.[0]?.detail ?? t("alerts.save_error");
+        app.alerts.show({ type: "error" }, detail);
+        this.loading = false;
       })
       .then(() => {
         this.saving = false;

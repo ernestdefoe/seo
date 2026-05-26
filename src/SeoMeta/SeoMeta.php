@@ -47,17 +47,21 @@ class SeoMeta extends AbstractModel
 
     protected $table = 'seo_meta';
 
-    protected $fillable = [
-        'object_id',
-        'object_type',
-
-        // Other data
-        'title',
-        'description',
-        'keywords',
-        'created_at',
-        'updated_at'
-    ];
+    /**
+     * Switched from an explicit `$fillable` list to guarding only the
+     * primary key. The previous list left every robots-* column, every
+     * Twitter / OpenGraph field, `auto_update_data`, and
+     * `estimated_reading_time` off the allowlist — and the array-defaults
+     * path of `findByModelOrCreate(model, [...])` (line 234) hands its
+     * second argument to `create()`, which silently dropped any of those
+     * keys passed by a caller. Inverting to `$guarded = ['id']` makes
+     * every legitimate column mutable while still blocking PK
+     * tampering. Mass-assignment defence against external input lives
+     * one layer up at the JSON:API Schema `writable()` allowlist
+     * (CLAUDE.md §7) — internal callers that build this model never
+     * see request bodies directly.
+     */
+    protected $guarded = ['id'];
 
     /**
      * Laravel 9+ (which Flarum 2 ships) deprecated `$dates` in favor of
@@ -104,21 +108,7 @@ class SeoMeta extends AbstractModel
 
     /**
      * Find the SEO meta by object type
-     * 
-     * @param string $objectType Name of the object
-     * @param string $objectId ID of the object
-     */
-    public static function findByObjectType(string $objectType, int $objectId): Model
-    {
-        return self::firstOrCreate([
-            'object_type' => $objectType,
-            'object_id' => $objectId
-        ]);
-    }
-
-    /**
-     * Find the SEO meta by object type
-     * 
+     *
      * @param string $objectType Name of the object
      * @param string $objectId ID of the object
      */
