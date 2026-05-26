@@ -6,10 +6,12 @@ import SSLPage from './SSLPage';
 import Button from 'flarum/common/components/Button';
 import Sitemap from './Sitemap';
 
+const I18N_PREFIX = 'ernestdefoe-seo.admin.settings_page.menu';
+
 export default class SettingsPage extends ExtensionPage {
   content() {
     const page = m.route.param().page || 'health';
-    
+
     return (
       <div className="ExtensionPage-settings FlarumSEO">
         <div className={"seo-menu"}>
@@ -25,8 +27,14 @@ export default class SettingsPage extends ExtensionPage {
     );
   }
 
-  // Return button menus
+  // Return button menus. Labels go through the translator so the
+  // nine locale files this extension ships actually reach the admin
+  // UI — the previous build hardcoded the English strings inline,
+  // which meant only English ever rendered regardless of the
+  // operator's selected locale.
   menuButtons(page) {
+    const t = (key) => app.translator.trans(`${I18N_PREFIX}.${key}`);
+
     return [
       Button.component({
         className: `Button ${page === 'health' ? 'item-selected' : ''}`,
@@ -36,7 +44,7 @@ export default class SettingsPage extends ExtensionPage {
           })
         ),
         icon: 'fas fa-heartbeat',
-      }, 'Health check'),
+      }, t('health_check')),
       Button.component({
         className: `Button ${page === 'settings' ? 'item-selected' : ''}`,
         onclick: () => m.route.set(
@@ -46,7 +54,7 @@ export default class SettingsPage extends ExtensionPage {
           })
         ),
         icon: 'fas fa-cogs',
-      }, 'SEO settings'),
+      }, t('seo_settings')),
       Button.component({
         className: `Button ${page === 'sitemap' ? 'item-selected' : ''}`,
         onclick: () => m.route.set(
@@ -56,7 +64,7 @@ export default class SettingsPage extends ExtensionPage {
           })
         ),
         icon: 'fas fa-sitemap',
-      }, 'Sitemap information'),
+      }, t('sitemap_information')),
       Button.component({
         className: `Button ${page === 'search-engines' ? 'item-selected' : ''}`,
         onclick: () => m.route.set(
@@ -66,7 +74,7 @@ export default class SettingsPage extends ExtensionPage {
           })
         ),
         icon: 'fas fa-search',
-      }, 'Search engine information'),
+      }, t('search_engine_information')),
       Button.component({
         className: `Button ${page === 'ssl' ? 'item-selected' : ''}`,
         onclick: () => m.route.set(
@@ -76,7 +84,7 @@ export default class SettingsPage extends ExtensionPage {
           })
         ),
         icon: 'fas fa-shield-alt',
-      }, 'Set up SSL')
+      }, t('set_up_ssl'))
     ];
   }
 

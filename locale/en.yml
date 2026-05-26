@@ -3,6 +3,14 @@ ernestdefoe-seo:
     permissions:
       configure_seo: "Allow configuring SEO"
 
+    settings_page:
+      menu:
+        health_check: "Health check"
+        seo_settings: "SEO settings"
+        sitemap_information: "Sitemap information"
+        search_engine_information: "Search engine information"
+        set_up_ssl: "Set up SSL"
+
   forum:
     profile_title: "Profile of {username}"
     profile_description: "Profile of {username} | {discussion_count} discussions | {comment_count} posts"
