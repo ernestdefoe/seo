@@ -8,6 +8,15 @@ import FieldSet from "flarum/common/components/FieldSet";
 import countKeywords from "../../admin/utils/countKeywords";
 import clsx from "clsx";
 
+// Translator prefix for every UI string in this modal. All visible
+// strings live under `ernestdefoe-seo.admin.meta_seo_modal.*` in the
+// locale files. Previously every label was hardcoded English inline,
+// which silently made the eight non-English locale files this
+// extension ships unreachable for the admin meta-editing surface.
+const I18N_PREFIX = "ernestdefoe-seo.admin.meta_seo_modal";
+const t = (key, vars) =>
+  app.translator.trans(`${I18N_PREFIX}.${key}`, vars);
+
 // Flarum 2 split Modal: bare Modal no longer wraps its body in <form>,
 // so onsubmit + <Button type="submit"> are dead. FormModal restores
 // the form wrapper. className() is already implemented below.
@@ -28,18 +37,18 @@ export default class MetaSeoModal extends FormModal {
           Alert,
           {
             type: "error",
-            title: "This object is not a supported SeoMeta object",
+            title: t("not_supported.alert_title"),
             controls: [
               <a
                 class="Button Button--link"
                 href="https://community.v17.dev/knowledgebase/46"
                 target={"_blank"}
               >
-                Documentation
+                {t("not_supported.documentation_link")}
               </a>,
             ],
           },
-          "Please open this dialog using the objectType and objectId properties or register the object relationship instead."
+          t("not_supported.alert_body")
         );
 
         setTimeout(() => {
@@ -54,7 +63,7 @@ export default class MetaSeoModal extends FormModal {
     }
 
     this.hasChanges = false;
-    this.closeText = "Close";
+    this.closeText = t("buttons.close");
     this.closeInfoText = null;
     this.loading = false;
 
@@ -107,7 +116,7 @@ export default class MetaSeoModal extends FormModal {
   }
 
   title() {
-    return "SEO settings - Meta";
+    return t("title");
   }
 
   className() {
@@ -131,6 +140,17 @@ export default class MetaSeoModal extends FormModal {
       });
   }
 
+  // Compact helper for the "✓ Managed" indicator that appears on every
+  // managed-field column. The label needs the translator wrap; the
+  // icon + container stay inline.
+  managedTag() {
+    return (
+      <div className="ManagedText">
+        <i className="fas fa-check" /> {t("managed_label")}
+      </div>
+    );
+  }
+
   content() {
     // Hide due to invalid relationship or loading data
     if (!this.initialized || this.initialLoading) {
@@ -143,12 +163,8 @@ export default class MetaSeoModal extends FormModal {
           <div className="Form">
             <div className="SeoItemContainer">
               <div className="SeoItemInfo">
-                <div class={"SeoItemInfo-title"}>Auto update meta tags</div>
-                <div className="helpText">
-                  {
-                    "When enabled, this items meta tags are automatically updated when the object changes."
-                  }
-                </div>
+                <div class={"SeoItemInfo-title"}>{t("auto_update.title")}</div>
+                <div className="helpText">{t("auto_update.help")}</div>
               </div>
               <div className="SeoItemContent">
                 <div className="ManagedContainer">
@@ -160,7 +176,7 @@ export default class MetaSeoModal extends FormModal {
                         this.updateHasChanges();
                       },
                     },
-                    "Update object SEO on change"
+                    t("auto_update.switch_label")
                   )}
                 </div>
               </div>
@@ -168,8 +184,8 @@ export default class MetaSeoModal extends FormModal {
 
             <div className="SeoItemContainer">
               <div className="SeoItemInfo">
-                <div class={"SeoItemInfo-title"}>Meta title</div>
-                <div className="helpText">Title in search engines.</div>
+                <div class={"SeoItemInfo-title"}>{t("meta_title.title")}</div>
+                <div className="helpText">{t("meta_title.help")}</div>
               </div>
 
               <div className="SeoItemContent">
@@ -177,25 +193,19 @@ export default class MetaSeoModal extends FormModal {
                   <input
                     className="FormControl"
                     bidi={this.metaTitle}
-                    placeholder="Enter page title"
+                    placeholder={t("meta_title.placeholder")}
                     disabled={this.autoUpdateData()}
                   />
 
-                  {this.autoUpdateData() && (
-                    <div className="ManagedText">
-                      <i className="fas fa-check" /> Managed
-                    </div>
-                  )}
+                  {this.autoUpdateData() && this.managedTag()}
                 </div>
               </div>
             </div>
 
             <div className="SeoItemContainer">
               <div className="SeoItemInfo">
-                <div class={"SeoItemInfo-title"}> Meta description</div>
-                <div className="helpText">
-                  Describes the item and shown in search engines.
-                </div>
+                <div class={"SeoItemInfo-title"}>{t("meta_description.title")}</div>
+                <div className="helpText">{t("meta_description.help")}</div>
               </div>
 
               <div className="SeoItemContent">
@@ -203,32 +213,26 @@ export default class MetaSeoModal extends FormModal {
                   <textarea
                     className="FormControl"
                     bidi={this.description}
-                    placeholder="Add a few keywords"
+                    placeholder={t("meta_description.placeholder")}
                     disabled={this.autoUpdateData()}
                   />
 
-                  {this.autoUpdateData() && (
-                    <div className="ManagedText">
-                      <i className="fas fa-check" /> Managed
-                    </div>
-                  )}
+                  {this.autoUpdateData() && this.managedTag()}
                 </div>
               </div>
             </div>
 
             <div className="SeoItemContainer">
               <div className="SeoItemInfo">
-                <div class={"SeoItemInfo-title"}>Keywords</div>
-                <div className="helpText">
-                  {"Enter one or more keywords that describes this item."}
-                </div>
+                <div class={"SeoItemInfo-title"}>{t("keywords.title")}</div>
+                <div className="helpText">{t("keywords.help")}</div>
               </div>
 
               <div className="SeoItemContent">
                 <textarea
                   className="FormControl"
                   bidi={this.keywords}
-                  placeholder="Add a few keywords"
+                  placeholder={t("keywords.placeholder")}
                 />
                 <div
                   className={clsx(
@@ -236,16 +240,16 @@ export default class MetaSeoModal extends FormModal {
                     countKeywords(this.keywords() ?? "") == false && "invalid"
                   )}
                 >
-                  <b>Note: Separate keywords with a comma.</b> Example:{" "}
-                  <i>flarum, web development, forum, apples, security</i>
+                  <b>{t("keywords.note")}</b> {t("keywords.example_prefix")}{" "}
+                  <i>{t("keywords.example")}</i>
                 </div>
               </div>
             </div>
 
             <div className="SeoItemContainer">
               <div className="SeoItemInfo">
-                <div class={"SeoItemInfo-title"}>Meta image</div>
-                <div className="helpText">Displays an image.</div>
+                <div class={"SeoItemInfo-title"}>{t("meta_image.title")}</div>
+                <div className="helpText">{t("meta_image.help")}</div>
               </div>
 
               <div className="SeoItemContent">
@@ -253,7 +257,7 @@ export default class MetaSeoModal extends FormModal {
                   <input
                     className="FormControl"
                     bidi={this.openGraphImage}
-                    placeholder="Enter image URL"
+                    placeholder={t("meta_image.placeholder")}
                     disabled={
                       this.autoUpdateData() &&
                       this.openGraphImageSource() === "auto"
@@ -262,11 +266,8 @@ export default class MetaSeoModal extends FormModal {
 
                   {/* Show managed tag */}
                   {this.autoUpdateData() &&
-                    this.openGraphImageSource() !== "custom" && (
-                      <div className="ManagedText">
-                        <i className="fas fa-check" /> Managed
-                      </div>
-                    )}
+                    this.openGraphImageSource() !== "custom" &&
+                    this.managedTag()}
 
                   {!this.autoUpdateData() &&
                     this.returnFoFUploadButton((fileUrl) => {
@@ -278,7 +279,9 @@ export default class MetaSeoModal extends FormModal {
                   {this.openGraphImageSource() !== "auto" &&
                     this.openGraphImageSource() !== "custom" && (
                       <div className="SeoItemContent-helpertext">
-                        Image source managed by {this.openGraphImageSource()}
+                        {t("meta_image.managed_by", {
+                          source: this.openGraphImageSource(),
+                        })}
                       </div>
                     )}
                 </div>
@@ -288,10 +291,8 @@ export default class MetaSeoModal extends FormModal {
             {/* Robots */}
             <div className="SeoItemContainer">
               <div className="SeoItemInfo">
-                <div class={"SeoItemInfo-title"}>Robots</div>
-                <div className="helpText">
-                  Robot-crawling settings for this item.
-                </div>
+                <div class={"SeoItemInfo-title"}>{t("robots.title")}</div>
+                <div className="helpText">{t("robots.help")}</div>
               </div>
 
               <div className="SeoItemContent">
@@ -307,24 +308,20 @@ export default class MetaSeoModal extends FormModal {
                   >
                     {this.returnTag(
                       !this.robotsNoindex(),
-                      "Allow indexing page",
-                      "Page indexing not allowed"
+                      t("robots.tag_index_allowed"),
+                      t("robots.tag_index_disallowed")
                     )}
                     {this.returnTag(
                       !this.robotsNofollow(),
-                      "Allow follow links",
-                      "Link following not allowed"
+                      t("robots.tag_follow_allowed"),
+                      t("robots.tag_follow_disallowed")
                     )}
                     {this.robotsNoarchive() &&
-                      this.returnTag(false, "", "Archiving pages not allowed")}
+                      this.returnTag(false, "", t("robots.tag_noarchive"))}
                     {this.robotsNoimageindex() &&
-                      this.returnTag(false, "", "Image indexing not allowed")}
+                      this.returnTag(false, "", t("robots.tag_noimageindex"))}
                     {this.robotsNosnippet() &&
-                      this.returnTag(
-                        false,
-                        "",
-                        "Taking text-snippets not allowed"
-                      )}
+                      this.returnTag(false, "", t("robots.tag_nosnippet"))}
                   </div>
 
                   <div className={"SeoTags-dropdown"}>
@@ -336,7 +333,7 @@ export default class MetaSeoModal extends FormModal {
                           this.updateHasChanges();
                         },
                       },
-                      "Allow indexing page"
+                      t("robots.switch_noindex")
                     )}
                     {Switch.component(
                       {
@@ -346,7 +343,7 @@ export default class MetaSeoModal extends FormModal {
                           this.updateHasChanges();
                         },
                       },
-                      "Allow following links to different pages"
+                      t("robots.switch_nofollow")
                     )}
                     {Switch.component(
                       {
@@ -356,7 +353,7 @@ export default class MetaSeoModal extends FormModal {
                           this.updateHasChanges();
                         },
                       },
-                      "Disable archiving page (noarchive)"
+                      t("robots.switch_noarchive")
                     )}
                     {Switch.component(
                       {
@@ -366,7 +363,7 @@ export default class MetaSeoModal extends FormModal {
                           this.updateHasChanges();
                         },
                       },
-                      "Disable indexing images on this page (noimageindex)"
+                      t("robots.switch_noimageindex")
                     )}
                     {Switch.component(
                       {
@@ -376,7 +373,7 @@ export default class MetaSeoModal extends FormModal {
                           this.updateHasChanges();
                         },
                       },
-                      "Disable text-snippes on page (nosnippet)"
+                      t("robots.switch_nosnippet")
                     )}
                   </div>
                 </div>
@@ -385,10 +382,8 @@ export default class MetaSeoModal extends FormModal {
 
             <div className="SeoItemContainer">
               <div className="SeoItemInfo">
-                <div class={"SeoItemInfo-title"}>Estimated reading time</div>
-                <div className="helpText">
-                  Estimated reading time in seconds.
-                </div>
+                <div class={"SeoItemInfo-title"}>{t("reading_time.title")}</div>
+                <div className="helpText">{t("reading_time.help")}</div>
               </div>
 
               <div className="SeoItemContent">
@@ -396,23 +391,19 @@ export default class MetaSeoModal extends FormModal {
                   <input
                     className="FormControl"
                     bidi={this.estimatedReadingTime}
-                    placeholder="Reading time in seconds"
+                    placeholder={t("reading_time.placeholder")}
                     type="number"
                     disabled={this.autoUpdateData()}
                   />
 
-                  {this.autoUpdateData() && (
-                    <div className="ManagedText">
-                      <i className="fas fa-check" /> Managed
-                    </div>
-                  )}
+                  {this.autoUpdateData() && this.managedTag()}
                 </div>
               </div>
             </div>
 
             <div className="SeoItemContainer">
               <div className="SeoItemInfo">
-                <div class={"SeoItemInfo-title"}>Twitter card</div>
+                <div class={"SeoItemInfo-title"}>{t("twitter.card_title")}</div>
               </div>
 
               <div className="SeoItemContent">
@@ -423,14 +414,10 @@ export default class MetaSeoModal extends FormModal {
                       onchange: (value) => (this.enableCustomTwitter = !value),
                       disabled: this.autoUpdateData(),
                     },
-                    "Auto generate Twitter card"
+                    t("twitter.switch_auto")
                   )}
 
-                  {this.autoUpdateData() && (
-                    <div className="ManagedText">
-                      <i className="fas fa-check" /> Managed
-                    </div>
-                  )}
+                  {this.autoUpdateData() && this.managedTag()}
                 </div>
               </div>
             </div>
@@ -438,7 +425,7 @@ export default class MetaSeoModal extends FormModal {
             {this.enableCustomTwitter && (
               <div className="SeoItemContainer">
                 <div className="SeoItemInfo">
-                  <div class={"SeoItemInfo-title"}>Twitter title</div>
+                  <div class={"SeoItemInfo-title"}>{t("twitter.title")}</div>
                 </div>
 
                 <div className="SeoItemContent">
@@ -457,7 +444,7 @@ export default class MetaSeoModal extends FormModal {
             {this.enableCustomTwitter && (
               <div className="SeoItemContainer">
                 <div className="SeoItemInfo">
-                  <div class={"SeoItemInfo-title"}>Twitter description</div>
+                  <div class={"SeoItemInfo-title"}>{t("twitter.description")}</div>
                 </div>
 
                 <div className="SeoItemContent">
@@ -476,8 +463,8 @@ export default class MetaSeoModal extends FormModal {
             {this.enableCustomTwitter && (
               <div className="SeoItemContainer">
                 <div className="SeoItemInfo">
-                  <div class={"SeoItemInfo-title"}>Twitter image</div>
-                  <div className="helpText">Displays an image on Twitter.</div>
+                  <div class={"SeoItemInfo-title"}>{t("twitter.image_title")}</div>
+                  <div className="helpText">{t("twitter.image_help")}</div>
                 </div>
 
                 <div className="SeoItemContent">
@@ -485,7 +472,9 @@ export default class MetaSeoModal extends FormModal {
                     <input
                       className="FormControl"
                       bidi={this.twitterImage}
-                      placeholder={this.openGraphImage() ?? "Enter image URL"}
+                      placeholder={
+                        this.openGraphImage() ?? t("twitter.image_placeholder")
+                      }
                       disabled={
                         this.autoUpdateData() && this.twitterImage() === "auto"
                       }
@@ -500,7 +489,10 @@ export default class MetaSeoModal extends FormModal {
                     {this.twitterImageSource() !== "auto" &&
                       this.twitterImageSource() !== "custom" && (
                         <div className="SeoItemContent-helpertext">
-                          Image source managed by {this.twitterImageSource()} -{" "}
+                          {t("twitter.image_managed_by", {
+                            source: this.twitterImageSource(),
+                          })}{" "}
+                          -{" "}
                           <a
                             href="#"
                             onclick={(e) => {
@@ -511,7 +503,7 @@ export default class MetaSeoModal extends FormModal {
                               this.updateHasChanges();
                             }}
                           >
-                            Reset image
+                            {t("twitter.reset_image")}
                           </a>
                         </div>
                       )}
@@ -522,7 +514,7 @@ export default class MetaSeoModal extends FormModal {
 
             <div className="SeoItemContainer">
               <div className="SeoItemInfo">
-                <div class={"SeoItemInfo-title"}>Open Graph tags</div>
+                <div class={"SeoItemInfo-title"}>{t("open_graph.tags_title")}</div>
               </div>
 
               <div className="SeoItemContent">
@@ -534,14 +526,10 @@ export default class MetaSeoModal extends FormModal {
                         (this.enableCustomOpenGraph = !value),
                       disabled: this.autoUpdateData(),
                     },
-                    "Auto generate Open Graph tags"
+                    t("open_graph.switch_auto")
                   )}
 
-                  {this.autoUpdateData() && (
-                    <div className="ManagedText">
-                      <i className="fas fa-check" /> Managed
-                    </div>
-                  )}
+                  {this.autoUpdateData() && this.managedTag()}
                 </div>
               </div>
             </div>
@@ -549,7 +537,7 @@ export default class MetaSeoModal extends FormModal {
             {this.enableCustomOpenGraph && (
               <div className="SeoItemContainer">
                 <div className="SeoItemInfo">
-                  <div class={"SeoItemInfo-title"}>Open Graph title</div>
+                  <div class={"SeoItemInfo-title"}>{t("open_graph.title")}</div>
                 </div>
 
                 <div className="SeoItemContent">
@@ -568,7 +556,7 @@ export default class MetaSeoModal extends FormModal {
             {this.enableCustomOpenGraph && (
               <div className="SeoItemContainer">
                 <div className="SeoItemInfo">
-                  <div class={"SeoItemInfo-title"}>Open Graph description</div>
+                  <div class={"SeoItemInfo-title"}>{t("open_graph.description")}</div>
                 </div>
 
                 <div className="SeoItemContent">
@@ -576,7 +564,7 @@ export default class MetaSeoModal extends FormModal {
                     <textarea
                       className="FormControl"
                       bidi={this.openGraphDescription}
-                      placeholder="Custom Twitter description"
+                      placeholder={t("open_graph.description_placeholder")}
                       disabled={this.autoUpdateData()}
                     />
                   </div>
@@ -588,7 +576,7 @@ export default class MetaSeoModal extends FormModal {
         <div style="padding: 25px 30px; text-align: center;">
           {this.closeInfoText && (
             <div style="margin-bottom: 15px; font-size: 12px;">
-              <b>Note:</b> {this.closeInfoText}
+              <b>{t("footer.note_prefix")}</b> {this.closeInfoText}
             </div>
           )}
           {this.closeDialogButton()}
@@ -638,7 +626,7 @@ export default class MetaSeoModal extends FormModal {
             );
           }}
         >
-          Upload file
+          {t("upload_button")}
         </Button>
       );
     }
@@ -668,12 +656,13 @@ export default class MetaSeoModal extends FormModal {
 
   updateHasChanges() {
     this.closeText =
-      !this.wasManaged && this.autoUpdateData() ? "Save & auto-fill" : "Save";
+      !this.wasManaged && this.autoUpdateData()
+        ? t("buttons.save_and_autofill")
+        : t("buttons.save");
 
     // Transform custom tags to managed tags
     if (!this.wasManaged && this.autoUpdateData()) {
-      this.closeInfoText =
-        "This change will revert custom changes and fill the meta-tags with item-data.";
+      this.closeInfoText = t("footer.revert_warning");
     }
 
     this.hasChanges = true;
@@ -753,7 +742,7 @@ export default class MetaSeoModal extends FormModal {
     this.meta
       .save(this.submitData())
       .then(() => {
-        app.alerts.show({ type: "success" }, "Saved!");
+        app.alerts.show({ type: "success" }, t("alerts.saved"));
         this.hide();
       })
       .catch((e) => {
