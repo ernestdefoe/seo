@@ -31,6 +31,8 @@
     "fof/best-answer": "^2.0",
     "flarum/phpstan": "^2.0"
   },
+  "minimum-stability": "beta",
+  "prefer-stable": true,
   "conflict": {
     "zerosonesfun/elint": "*",
     "franzl/flarum-open-links-in-new-tab": "*"
