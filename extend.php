@@ -60,24 +60,26 @@ if (class_exists(\Flarum\Tags\Tag::class)) {
  * GET /robots.txt makes FastRoute throw
  *   `Cannot register two routes matching "/robots.txt" for method "GET"`
  * at boot, before either controller ever runs — the whole forum 500s.
- * fof/sitemap's extend.php DOES try to delete the conflicting routes by
- * name, but it targets the upstream v17development route names
- * (`flarum-seo.robots`, `flarum-seo.sitemap`); this fork renamed them to
- * `ernestdefoe-seo.*` for vendor isolation, so the cleanup misses them
- * and the crash hits.
+ * fof/sitemap does NOT remove the conflicting routes (and even if it did,
+ * it would target the upstream `flarum-seo.*` names, not this fork's
+ * `ernestdefoe-seo.*`), so the only place to defer is here.
  *
- * `class_exists` is the right gate here: composer autoloading is
- * resolved by the time extend.php is read, but the extension manager's
- * enabled-list isn't necessarily — and we want to defer regardless of
- * whether fof/sitemap is currently *enabled*, since route registration
- * happens unconditionally for every installed extension.
+ * Gate on the composer package, NOT a class name: fof/sitemap exposes no
+ * top-level `FoF\Sitemap\Sitemap` class (its classes live under
+ * sub-namespaces such as `FoF\Sitemap\Extend\Sitemap` /
+ * `FoF\Sitemap\Controllers\RobotsController`), so the previous
+ * `class_exists(\FoF\Sitemap\Sitemap::class)` check was ALWAYS false and
+ * never actually suppressed the routes — the forum crashed whenever both
+ * extensions were enabled. `Composer\InstalledVersions::isInstalled` is
+ * resolved by autoload time, independent of the extension manager's
+ * enabled-list, and immune to fof/sitemap renaming its classes.
  *
  * SitemapController still has a runtime `class_exists(\FoF\Sitemap\...)`
  * 404 fallback as defense-in-depth, but the real fix lives here.
  */
 $routes = new Extend\Routes('forum');
 
-if (! class_exists(\FoF\Sitemap\Sitemap::class)) {
+if (! \Composer\InstalledVersions::isInstalled('fof/sitemap')) {
     $routes
         ->get('/robots.txt', 'ernestdefoe-seo.robots', Robots::class)
         ->get('/sitemap.xml', 'ernestdefoe-seo.sitemap', SitemapController::class);
