@@ -2,6 +2,7 @@
 
 namespace V17Development\FlarumSeo\Page;
 
+use Flarum\Http\RequestUtil;
 use Flarum\User\UserRepository;
 use Illuminate\Support\Arr;
 use Psr\Http\Message\ServerRequestInterface;
@@ -49,8 +50,16 @@ class ProfilePage implements PageDriverInterface
     ) {
         $username = Arr::get($request->getQueryParams(), 'username');
 
+        // Scope the lookup to the requesting actor's visibility so that, on a
+        // forum where the user list isn't public, an anonymous request can't
+        // pull a hidden user's name/counts/bio/avatar into the meta tags.
+        // findOrFailByUsername (unlike findByIdentification) applies that scope.
+        $actor = RequestUtil::getActor($request);
+
         try {
-            $user = is_numeric($username) ? $this->userRepository->findOrFail($username) : $this->userRepository->findByIdentification($username);
+            $user = is_numeric($username)
+                ? $this->userRepository->findOrFail($username, $actor)
+                : $this->userRepository->findOrFailByUsername($username, $actor);
 
             // Make sure there's a user
             if ($user === null) return;

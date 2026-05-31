@@ -4,8 +4,8 @@ namespace V17Development\FlarumSeo\Subscribers;
 
 use Flarum\Discussion\Discussion;
 use Flarum\Discussion\Event as DiscussionEvent;
+use V17Development\FlarumSeo\SeoContentUtils;
 use V17Development\FlarumSeo\SeoMeta\SeoMeta;
-use V17Development\FlarumSeo\SeoProperties;
 use V17Development\FlarumSeo\SeoMeta\Event\Created;
 
 /**
@@ -13,7 +13,9 @@ use V17Development\FlarumSeo\SeoMeta\Event\Created;
  */
 class DiscussionSubscriber
 {
-    public function __construct(private SeoProperties $seoProperties) {}
+    // Inject the stateless SeoContentUtils instead of SeoProperties, so this
+    // hot-path subscriber doesn't construct a PageListener on every event.
+    public function __construct(private SeoContentUtils $contentUtils) {}
 
     /**
      * Subscribe to events
@@ -111,10 +113,10 @@ class DiscussionSubscriber
             $content = $firstPost->formatContent();
 
             // Set page description
-            $meta->description = $this->seoProperties->generateDescriptionFromContent($content);
+            $meta->description = $this->contentUtils->generateDescriptionFromContent($content);
 
             // Set estimated reading time
-            $estimatedReadingTime = $this->seoProperties->getEstimatedReadingTime($content);
+            $estimatedReadingTime = $this->contentUtils->getEstimatedReadingTime($content);
 
             // If higher than zero, update reading time
             if ($estimatedReadingTime > 0) {
@@ -124,7 +126,7 @@ class DiscussionSubscriber
             // Only update image if source was set to auto and is not managed by a different extension
             if (!$meta->open_graph_image_source || $meta->open_graph_image_source === 'auto') {
                 // Set page image
-                if ($image = $this->seoProperties->getImageFromContent($content)) {
+                if ($image = $this->contentUtils->getImageFromContent($content)) {
                     $meta->open_graph_image = $image;
                     $meta->open_graph_image_source = 'auto';
                 }

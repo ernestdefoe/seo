@@ -3,7 +3,6 @@
 namespace V17Development\FlarumSeo\Subscribers;
 
 use V17Development\FlarumSeo\SeoMeta\SeoMeta;
-use V17Development\FlarumSeo\SeoProperties;
 use Flarum\Post\Event as PostEvent;
 
 /**
@@ -11,8 +10,9 @@ use Flarum\Post\Event as PostEvent;
  */
 class PostSubscriber
 {
+    // Only needs DiscussionSubscriber::updateMeta(); the previous SeoProperties
+    // dependency was unused and pulled a PageListener into the event hot path.
     public function __construct(
-        private SeoProperties $seoProperties,
         private DiscussionSubscriber $discussionSubscriber
     ) {}
 

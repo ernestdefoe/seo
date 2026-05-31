@@ -32,9 +32,12 @@ export default class SeoSettings extends Component {
 
     this.allowBotsValue = settings.seo_allow_all_bots !== "0";
 
-    // Cheat 'seo_social_media_imageUrl'
-    // Todo: Find a better way
-    app.forum.data.attributes.seo_social_media_imageUrl = app.data.settings.seo_social_media_image_url;
+    // (Removed the old "Cheat" that mutated app.forum.data.attributes directly.
+    // The social-media image is now exposed on the forum payload as
+    // `seoSocialMediaImageUrl` via ForumResource — see extend.php — so it's
+    // readable through app.forum.attribute() like any other forum attribute.
+    // The upload control below still reads/writes app.data.settings, which is
+    // the live admin-settings bag the UploadImageButton updates after upload.)
 
     this.showField = 'all';
 

@@ -13,6 +13,7 @@ use Illuminate\Contracts\Filesystem\Cloud;
 // Laravel classes
 use Psr\Http\Message\ServerRequestInterface;
 use V17Development\FlarumSeo\Page\PageManager;
+use V17Development\FlarumSeo\SeoContentUtils;
 use V17Development\FlarumSeo\SeoMeta\SeoMeta;
 use V17Development\FlarumSeo\SeoProperties;
 
@@ -421,22 +422,8 @@ class PageListener
      */
     public function getImageFromContent(?string $content = null): ?string
     {
-        // Check post content is not empty
-        if ($content !== null) {
-            // Read Post content and filter image url
-            $pattern = '/(?<=src=")((http.*?\.)(jpe?g|png|[tg]iff?|svg|webp)(\?[a-zA-Z0-9\_\-\=\&]*)?)(?=")/';
-
-            // Use image from post for social media og:image
-            if (preg_match_all($pattern, $content, $matches) && count($matches) > 0) {
-                $contentImage = $matches[0][0];
-
-                if ($contentImage !== null) {
-                    return $contentImage;
-                }
-            }
-        }
-
-        return null;
+        // Delegated to the stateless SeoContentUtils (single source of truth).
+        return (new SeoContentUtils())->getImageFromContent($content);
     }
 
     /**
@@ -444,11 +431,8 @@ class PageListener
      */
     public function getEstimatedReadingTime(string $content = null)
     {
-        $words = str_word_count(strip_tags($content));
-        $minutes = floor($words / 200);
-        $seconds = floor($words % 200 / (200 / 60));
-
-        return ($minutes * 60) + $seconds;
+        // Delegated to the stateless SeoContentUtils (single source of truth).
+        return (new SeoContentUtils())->getEstimatedReadingTime($content);
     }
 
     /**

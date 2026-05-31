@@ -760,7 +760,7 @@ export default class MetaSeoModal extends FormModal {
         this.loading = false;
       })
       .then(() => {
-        this.saving = false;
+        this.loading = false;
         m.redraw();
       });
   }

@@ -13,13 +13,20 @@ class SeoProperties
     // SEO container
     private $container = null;
 
+    private SeoContentUtils $contentUtils;
+
     /**
      * Initializing extender. For internal user only.
      */
-    public function __construct(PageListener $container)
+    public function __construct(PageListener $container, ?SeoContentUtils $contentUtils = null)
     {
         // Set container
         $this->container = $container;
+
+        // Stateless content helpers (description / image / reading time). Kept
+        // injectable for testing; defaulted so the manual `new SeoProperties($this)`
+        // in PageListener keeps working without a container round-trip.
+        $this->contentUtils = $contentUtils ?? new SeoContentUtils();
     }
 
     /**
@@ -67,10 +74,7 @@ class SeoProperties
      */
     public function generateDescriptionFromContent($content): string
     {
-        $description = strip_tags($content);
-        $description = trim(preg_replace('/\s+/', ' ', mb_substr($description, 0, 157))) . (mb_strlen($description) > 157 ? '...' : '');
-
-        return $description;
+        return $this->contentUtils->generateDescriptionFromContent($content);
     }
 
     /**
@@ -237,12 +241,12 @@ class SeoProperties
 
     public function getImageFromContent(?string $content = null)
     {
-        return $this->container->getImageFromContent($content);
+        return $this->contentUtils->getImageFromContent($content);
     }
 
     public function getEstimatedReadingTime(string $content = null)
     {
-        return $this->container->getEstimatedReadingTime($content);
+        return $this->contentUtils->getEstimatedReadingTime($content);
     }
 
     /**

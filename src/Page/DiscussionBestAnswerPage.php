@@ -3,9 +3,11 @@
 namespace V17Development\FlarumSeo\Page;
 
 use Flarum\Database\Eloquent\Collection;
+use Flarum\Discussion\Discussion;
 use Flarum\Discussion\DiscussionRepository;
 use Flarum\Extension\ExtensionManager;
 use Flarum\Foundation\DispatchEventsTrait;
+use Flarum\Http\RequestUtil;
 use Flarum\Http\UrlGenerator;
 use Flarum\Http\SlugManager;
 use Flarum\Post\Post;
@@ -23,6 +25,13 @@ use V17Development\FlarumSeo\SeoProperties;
 class DiscussionBestAnswerPage implements PageDriverInterface
 {
     use DispatchEventsTrait;
+
+    /**
+     * Cap on the number of suggested-answer rows pulled into the JSON-LD, so a
+     * thread with thousands of replies can't load every full post (content XML
+     * included) into memory and OOM this render.
+     */
+    private const MAX_SUGGESTED_ANSWERS = 200;
 
     /**
      * @var SettingsRepositoryInterface
@@ -112,8 +121,9 @@ class DiscussionBestAnswerPage implements PageDriverInterface
         $discussionId = Arr::get($request->getQueryParams(), 'id');
 
         try {
-            // Find discussion
-            $discussion = $this->discussionRepository->findOrFail($discussionId);
+            // Find discussion — scoped to the requesting actor's visibility so a
+            // hidden / tag-restricted discussion never leaks into the meta tags.
+            $discussion = $this->discussionRepository->findOrFail($discussionId, RequestUtil::getActor($request));
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             // Do nothing, no model found
             return;
@@ -188,24 +198,35 @@ class DiscussionBestAnswerPage implements PageDriverInterface
             );
         }
 
-        // Only add suggested answers property if there are posts
         $mainEntity['suggestedAnswer'] = [];
 
-        // Get all public comments for this discussion.
-        //
-        // Eager-load `user` so the per-post Schema.org author lookup
-        // (`$post->user->display_name` + URL) doesn't fire N+1 user
-        // queries; withCount('likes') gives us $post->likes_count as
-        // an aggregate column so we can read the upvoteCount without
-        // hydrating every Like row into memory. On a 200-reply Q&A
-        // page this avoids ~400 extra DB roundtrips per render — and
-        // this render is the one Google's structured-data crawler
-        // hits, so latency here is visible to ranking.
+        // The accepted answer can sit anywhere in a long thread, so fetch it by
+        // id with a targeted query rather than hoping it falls inside the capped
+        // suggested-answers set below.
+        if ($bestAnswerId) {
+            $acceptedPost = $discussion->posts()
+                ->with('user')
+                ->withCount('likes')
+                ->where('id', $bestAnswerId)
+                ->where('number', '>', '1')
+                ->first();
+
+            if ($acceptedPost && !$acceptedPost->is_private && $acceptedPost->type === 'comment') {
+                $mainEntity['acceptedAnswer'] = $this->buildAnswer($acceptedPost, $discussion, $enableLikes);
+            }
+        }
+
+        // Suggested answers — capped (see MAX_SUGGESTED_ANSWERS). Eager-load
+        // `user` so the per-post author lookup isn't N+1; withCount('likes')
+        // exposes $post->likes_count as an aggregate so upvoteCount reads it
+        // without hydrating every Like row.
         /** @var Collection<Post> $posts */
         $posts = $discussion->posts()
             ->with('user')
             ->withCount('likes')
             ->where('number', '>', '1')
+            ->when($bestAnswerId, fn ($query) => $query->where('id', '!=', $bestAnswerId))
+            ->limit(self::MAX_SUGGESTED_ANSWERS)
             ->get();
 
         foreach ($posts as $post) {
@@ -214,39 +235,32 @@ class DiscussionBestAnswerPage implements PageDriverInterface
                 continue;
             }
 
-            // Temp post — same reasoning as firstPost above: render
-            // through formatContent() so mention/bbcode/quote nodes
-            // are resolved before strip_tags() runs.
-            $generatedPost = [
-                '@type' => 'Answer',
-                'text' => strip_tags($post->formatContent()),
-                'dateCreated' => $post->created_at->toIso8601String(),
-                'url' => $this->urlGenerator->to('forum')->route('discussion', ['id' => $discussion->id . '-' . $discussion->slug, 'near' => $post->number]),
-                'author' => [
-                    "@type" => "Person",
-                    "name" => $post->user ? $post->user->display_name : null,
-                    "url" => $post->user ? $this->urlGenerator->to('forum')->route('user', ['username' => $this->slugManager->forResource(User::class)->toSlug($post->user)]) : null,
-                ]
-            ];
-
-            // Upvote/like count — reads the aggregate `likes_count`
-            // column populated by `withCount('likes')` above instead
-            // of `$post->likes->count()` which hydrates the full
-            // collection. ?? 0 covers the case where flarum/likes is
-            // installed but the column wasn't loaded (e.g. a future
-            // refactor that drops the withCount).
-            $generatedPost['upvoteCount'] = $enableLikes ? (int) ($post->likes_count ?? 0) : 0;
-
-            // Set accepted answer
-            if ($bestAnswerId === $post->id) {
-                $mainEntity['acceptedAnswer'] = $generatedPost;
-            }
-            // Add to answers
-            else {
-                $mainEntity['suggestedAnswer'][] = $generatedPost;
-            }
+            $mainEntity['suggestedAnswer'][] = $this->buildAnswer($post, $discussion, $enableLikes);
         }
 
         $properties->setSchemaJson('mainEntity', $mainEntity);
+    }
+
+    /**
+     * Build one Schema.org Answer node from a post. formatContent() renders the
+     * stored TextFormatter XML to HTML so mention/bbcode/quote nodes resolve
+     * before strip_tags(); upvoteCount reads the aggregate likes_count column.
+     *
+     * @return array<string, mixed>
+     */
+    private function buildAnswer(Post $post, Discussion $discussion, bool $enableLikes): array
+    {
+        return [
+            '@type' => 'Answer',
+            'text' => strip_tags($post->formatContent()),
+            'dateCreated' => $post->created_at->toIso8601String(),
+            'url' => $this->urlGenerator->to('forum')->route('discussion', ['id' => $discussion->id . '-' . $discussion->slug, 'near' => $post->number]),
+            'author' => [
+                '@type' => 'Person',
+                'name' => $post->user ? $post->user->display_name : null,
+                'url' => $post->user ? $this->urlGenerator->to('forum')->route('user', ['username' => $this->slugManager->forResource(User::class)->toSlug($post->user)]) : null,
+            ],
+            'upvoteCount' => $enableLikes ? (int) ($post->likes_count ?? 0) : 0,
+        ];
     }
 }

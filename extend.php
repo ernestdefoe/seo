@@ -167,6 +167,15 @@ return [
             Schema\Boolean::make('canConfigureSeo')
                 ->get(fn ($model, $context) =>
                     $context->getActor()->hasPermissionLike('seo.canConfigure')),
+
+            // The configured social-media image, on the forum payload (admin
+            // only) so the admin UI can read it via
+            // app.forum.attribute('seoSocialMediaImageUrl') through the normal
+            // serialization path — instead of mutating app.forum.data directly.
+            Schema\Str::make('seoSocialMediaImageUrl')
+                ->nullable()
+                ->visible(fn ($model, $context) => $context->getActor()->isAdmin())
+                ->get(fn () => resolve(\Flarum\Settings\SettingsRepositoryInterface::class)->get('seo_social_media_image_url') ?: null),
         ]),
 
     (new SEO())

@@ -5,17 +5,19 @@ namespace V17Development\FlarumSeo\Subscribers;
 use Flarum\Tags\Event as TagEvent;
 use Flarum\Tags\Tag;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use V17Development\FlarumSeo\SeoContentUtils;
 use V17Development\FlarumSeo\SeoMeta\Event\Created;
 use V17Development\FlarumSeo\SeoMeta\SeoMeta;
-use V17Development\FlarumSeo\SeoProperties;
 
 /**
  * Subscribe to tags creation, update or deleted
  */
 class TagSubscriber
 {
+    // Stateless SeoContentUtils instead of SeoProperties, keeping PageListener
+    // off this event hot path.
     public function __construct(
-        private SeoProperties $seoProperties,
+        private SeoContentUtils $contentUtils,
         private TranslatorInterface $translator,
     ) {}
 
@@ -106,6 +108,6 @@ class TagSubscriber
         $description = $tag->description ?? $this->translator->trans('flarum-tags.forum.tag.meta_description_text', ['{tag}' => $tag->name]);
 
         // Get Tag description
-        $meta->description = $this->seoProperties->generateDescriptionFromContent($description);
+        $meta->description = $this->contentUtils->generateDescriptionFromContent($description);
     }
 }

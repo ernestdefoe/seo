@@ -6,6 +6,7 @@ use Flarum\Database\Eloquent\Collection;
 use Flarum\Discussion\DiscussionRepository;
 use Flarum\Extension\ExtensionManager;
 use Flarum\Foundation\DispatchEventsTrait;
+use Flarum\Http\RequestUtil;
 use Flarum\Http\UrlGenerator;
 use Flarum\Http\SlugManager;
 use Flarum\Settings\SettingsRepositoryInterface;
@@ -98,8 +99,10 @@ class DiscussionPage implements PageDriverInterface
         $discussionId = Arr::get($request->getQueryParams(), 'id');
 
         try {
-            // Find discussion
-            $discussion = $this->discussionRepository->findOrFail($discussionId);
+            // Find discussion — scoped to the requesting actor's visibility so a
+            // hidden / tag-restricted / soft-deleted discussion never leaks its
+            // title or description into the server-rendered meta tags.
+            $discussion = $this->discussionRepository->findOrFail($discussionId, RequestUtil::getActor($request));
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             // Do nothing, no model found
             return;
