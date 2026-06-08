@@ -14,8 +14,8 @@ export default class HealthCheck extends Page {
   view() {
     return (
       <div>
-        <p className="seo-intro">A quick SEO-health-check overview. If you have questions, ask your question the official <a href="https://discuss.flarum.org/d/18316-flarum-seo" target="_blank">Flarum forums <i className="fas fa-external-link-alt"/></a>. When you have issues, <a href="https://github.com/v17development/flarum-seo/issues" target="_blank">create a new issue <i className="fas fa-external-link-alt"/></a>.</p>
-        <p className="seo-intro">Are you a developer with some free time left? Contribute to the project <a href="https://github.com/v17development/flarum-seo" target="_blank">on GitHub <i className="fas fa-external-link-alt"/></a>. Have you have built a Flarum Extension and you'd like to use the SEO tools from this extension? Please <a href="https://community.v17.dev/knowledgebase/22" target="_blank">read the documentation <i className="fas fa-external-link-alt"/></a>.</p>
+        <p className="seo-intro">A quick SEO-health-check overview. When you have issues, <a href="https://github.com/ernestdefoe/seo/issues" target="_blank">create a new issue <i className="fas fa-external-link-alt"/></a> on this extension's repository.</p>
+        <p className="seo-intro">Are you a developer with some free time left? Contribute to the project <a href="https://github.com/ernestdefoe/seo" target="_blank">on GitHub <i className="fas fa-external-link-alt"/></a>.</p>
 
         <p className="seo-intro">For optimal search engine results, make sure all checks are green.</p>
 
@@ -354,7 +354,7 @@ export default class HealthCheck extends Page {
       .then(() => {
         app.alerts.show({type: 'success'}, app.translator.trans('core.admin.settings.saved_message'));
       })
-      .catch(() => {})
+      .catch(() => app.alerts.show({ type: 'error' }, app.translator.trans('core.lib.error.generic_message')))
       .then(() => {
         this.saving = false;
         m.redraw();

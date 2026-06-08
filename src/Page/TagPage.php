@@ -3,6 +3,7 @@
 namespace V17Development\FlarumSeo\Page;
 
 use Flarum\Foundation\DispatchEventsTrait;
+use Flarum\Http\RequestUtil;
 use Flarum\Tags\TagRepository;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
@@ -60,7 +61,10 @@ class TagPage implements PageDriverInterface
         }
 
         try {
-            $tag = $this->tagRepository->findOrFail($tagId);
+            // Scope to the requesting actor so a restricted tag never leaks its
+            // name/description into the server-rendered <head> for users who
+            // can't see it (mirrors DiscussionPage's actor-scoped lookup).
+            $tag = $this->tagRepository->findOrFail($tagId, RequestUtil::getActor($request));
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             // Do nothing, no model found
             return;

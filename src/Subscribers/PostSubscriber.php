@@ -4,6 +4,7 @@ namespace V17Development\FlarumSeo\Subscribers;
 
 use V17Development\FlarumSeo\SeoMeta\SeoMeta;
 use Flarum\Post\Event as PostEvent;
+use Psr\Log\LoggerInterface;
 
 /**
  * Subscribe to post deleting, posted or revised
@@ -13,7 +14,8 @@ class PostSubscriber
     // Only needs DiscussionSubscriber::updateMeta(); the previous SeoProperties
     // dependency was unused and pulled a PageListener into the event hot path.
     public function __construct(
-        private DiscussionSubscriber $discussionSubscriber
+        private DiscussionSubscriber $discussionSubscriber,
+        private LoggerInterface $log
     ) {}
 
     /**
@@ -47,22 +49,30 @@ class PostSubscriber
         $discussion = $event->post->discussion;
         if ($discussion === null) return;
 
-        // Find meta
-        $meta = SeoMeta::findOneByModel($discussion);
+        // SEO meta maintenance must never break the post action itself. A meta
+        // save() can fail (DB hiccup, constraint, etc.); catch + log it rather
+        // than letting it surface as an uncontrolled 500 on post/reply/edit.
+        try {
+            // Find meta
+            $meta = SeoMeta::findOneByModel($discussion);
 
-        // Create new meta by model
-        if (!$meta) {
-            $meta = SeoMeta::buildByModel($discussion);
+            // Create new meta by model
+            if (!$meta) {
+                $meta = SeoMeta::buildByModel($discussion);
+            }
+
+            // Do not auto update
+            if (!$meta->auto_update_data) {
+                return;
+            }
+
+            $this->discussionSubscriber->updateMeta($meta, $discussion);
+
+            // Update
+            $meta->save();
+        } catch (\Throwable $e) {
+            $this->log->warning('[seo] failed to update discussion SEO meta for discussion '
+                . $discussion->id . ': ' . $e->getMessage());
         }
-
-        // Do not auto update
-        if (!$meta->auto_update_data) {
-            return;
-        }
-
-        $this->discussionSubscriber->updateMeta($meta, $discussion);
-
-        // Update
-        $meta->save();
     }
 }

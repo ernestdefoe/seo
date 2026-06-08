@@ -128,6 +128,23 @@ class SeoMeta extends AbstractModel
      */
     public static function findByObjectTypeOrCreate(string $objectType, int $objectId, callable|null $fillables = null): Model
     {
+        return self::selectOrInsert($objectType, $objectId, $fillables);
+    }
+
+    /**
+     * Shared "find existing, otherwise insert" for the (object_type, object_id)
+     * unique key, with the concurrent-insert race handled in one place (was
+     * copy-pasted between findByObjectTypeOrCreate and findByModelOrCreate).
+     *
+     * Under concurrent first-time loads for the same object, two requests can
+     * both pass the SELECT and both attempt the INSERT — the loser hits the
+     * unique index and throws a QueryException with SQLSTATE 23000. We catch
+     * only that, re-run the SELECT to return the winning row, and let any other
+     * DB error surface. The "Created" event fires only for the request that
+     * actually inserted, which is the desired semantics.
+     */
+    private static function selectOrInsert(string $objectType, int $objectId, callable|null $fillables): Model
+    {
         $existing = self::where([
             ['object_type', '=', $objectType],
             ['object_id', '=', $objectId]
@@ -143,17 +160,6 @@ class SeoMeta extends AbstractModel
             $fillables($data);
         }
 
-        // Race condition: under concurrent page loads for the same new
-        // discussion (or any new object), two requests can both pass
-        // the SELECT above and both attempt the INSERT below — the
-        // second request hits the (object_type, object_id) unique
-        // index and throws a QueryException with SQLSTATE 23000. We
-        // catch only that specific class of error, re-run the SELECT
-        // to return the winning row, and let any other DB error
-        // surface normally. The "Created" event fires only for the
-        // request that actually inserted, which is the desired
-        // semantics — we don't want two duplicate created-events
-        // firing for the same row.
         try {
             $data->save();
             return $data;
@@ -229,40 +235,10 @@ class SeoMeta extends AbstractModel
             ], $fillables);
         }
 
-        // Callable path: same shape as findByObjectTypeOrCreate — SELECT,
-        // then INSERT on miss, then catch the unique-index collision that
-        // happens when two concurrent first-time requests for the same
-        // model (e.g. two bots hitting a tag page) both pass the SELECT
-        // and both attempt the INSERT. Without this guard, the loser
-        // surfaces a 500 because the closure inside firstOr() has no
-        // catch block.
-        $existing = self::where([
-            'object_type' => $objectType,
-            'object_id'   => $objectId,
-        ])->first();
-
-        if ($existing !== null) {
-            return $existing;
-        }
-
-        $data = SeoMeta::build($objectType, $objectId);
-        $fillables($data);
-
-        try {
-            $data->save();
-            return $data;
-        } catch (QueryException $e) {
-            if ((string) $e->getCode() !== '23000') {
-                throw $e;
-            }
-            $winner = self::where([
-                'object_type' => $objectType,
-                'object_id'   => $objectId,
-            ])->first();
-            if ($winner !== null) {
-                return $winner;
-            }
-            throw $e;
-        }
+        // Callable path: shares the SELECT-then-INSERT-with-race-guard logic
+        // with findByObjectTypeOrCreate (see selectOrInsert) — the firstOrCreate
+        // above can't take a closure, so this path handles the unique-index
+        // collision two concurrent first-time requests would otherwise 500 on.
+        return self::selectOrInsert($objectType, $objectId, $fillables);
     }
 }

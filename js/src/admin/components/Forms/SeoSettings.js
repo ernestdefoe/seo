@@ -435,7 +435,7 @@ export default class SeoSettings extends Component {
 
     saveSettings(settings)
       .then(() => app.alerts.show({type: 'success' },  app.translator.trans('core.admin.settings.saved_message')))
-      .catch(() => {})
+      .catch(() => app.alerts.show({ type: 'error' }, app.translator.trans('core.lib.error.generic_message')))
       .then(() => {
         this.saving = false;
         m.redraw();
@@ -454,7 +454,7 @@ export default class SeoSettings extends Component {
 
     saveSettings(data)
       .then(() => app.alerts.show({type: 'success' },  app.translator.trans('core.admin.settings.saved_message')))
-      .catch(() => {})
+      .catch(() => app.alerts.show({ type: 'error' }, app.translator.trans('core.lib.error.generic_message')))
       .then(() => {
         this.saving = false;
         m.redraw();
@@ -472,7 +472,7 @@ export default class SeoSettings extends Component {
 
     saveSettings(data)
       .then(() => app.alerts.show({type: 'success' },  app.translator.trans('core.admin.settings.saved_message')))
-      .catch(() => {})
+      .catch(() => app.alerts.show({ type: 'error' }, app.translator.trans('core.lib.error.generic_message')))
       .then(() => {
         this.saving = false;
         m.redraw();
