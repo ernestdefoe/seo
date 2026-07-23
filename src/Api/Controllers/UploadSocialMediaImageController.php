@@ -1,6 +1,6 @@
 <?php
 
-namespace V17Development\FlarumSeo\Api\Controllers;
+namespace Ernestdefoe\Seo\Api\Controllers;
 
 use Flarum\Foundation\ValidationException;
 use Flarum\Http\RequestUtil;

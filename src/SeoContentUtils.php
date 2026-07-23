@@ -1,6 +1,6 @@
 <?php
 
-namespace V17Development\FlarumSeo;
+namespace Ernestdefoe\Seo;
 
 /**
  * Stateless helpers for deriving SEO metadata from post content (description,

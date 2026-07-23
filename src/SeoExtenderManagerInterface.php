@@ -1,9 +1,9 @@
 <?php
 
-namespace V17Development\FlarumSeo;
+namespace Ernestdefoe\Seo;
 
 use Illuminate\Support\Collection;
-use V17Development\FlarumSeo\Page\PageDriverInterface;
+use Ernestdefoe\Seo\Page\PageDriverInterface;
 
 interface SeoExtenderManagerInterface
 {

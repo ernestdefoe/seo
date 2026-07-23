@@ -1,13 +1,13 @@
 <?php
 
-namespace V17Development\FlarumSeo\SeoMeta;
+namespace Ernestdefoe\Seo\SeoMeta;
 
 use Carbon\Carbon;
 use Flarum\Database\AbstractModel;
 use Flarum\Foundation\EventGeneratorTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
-use V17Development\FlarumSeo\SeoMeta\Event\Created;
+use Ernestdefoe\Seo\SeoMeta\Event\Created;
 
 /**
  * @property int $id

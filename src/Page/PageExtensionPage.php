@@ -1,14 +1,14 @@
 <?php
 
-namespace V17Development\FlarumSeo\Page;
+namespace Ernestdefoe\Seo\Page;
 
 use FoF\Pages\PageRepository;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Arr;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use V17Development\FlarumSeo\SeoMeta\SeoMeta;
-use V17Development\FlarumSeo\SeoProperties;
+use Ernestdefoe\Seo\SeoMeta\SeoMeta;
+use Ernestdefoe\Seo\SeoProperties;
 
 class PageExtensionPage implements PageDriverInterface
 {

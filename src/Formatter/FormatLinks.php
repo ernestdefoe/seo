@@ -1,6 +1,6 @@
 <?php
 
-namespace V17Development\FlarumSeo\Formatter;
+namespace Ernestdefoe\Seo\Formatter;
 
 use Flarum\Foundation\Application;
 use Flarum\Settings\SettingsRepositoryInterface;

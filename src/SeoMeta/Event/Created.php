@@ -1,8 +1,8 @@
 <?php
 
-namespace V17Development\FlarumSeo\SeoMeta\Event;
+namespace Ernestdefoe\Seo\SeoMeta\Event;
 
-use V17Development\FlarumSeo\SeoMeta\SeoMeta;
+use Ernestdefoe\Seo\SeoMeta\SeoMeta;
 
 class Created
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace V17Development\FlarumSeo;
+namespace Ernestdefoe\Seo;
 
 use Flarum\Api\Endpoint;
 use Flarum\Api\Resource\DiscussionResource;
@@ -9,18 +9,18 @@ use Flarum\Api\Schema;
 use Flarum\Database\AbstractModel;
 use Flarum\Discussion\Discussion as FlarumDiscussion;
 use Flarum\Extend;
-use V17Development\FlarumSeo\Api\Controllers\DeleteSocialMediaImageController;
-use V17Development\FlarumSeo\Api\Controllers\UploadSocialMediaImageController;
-use V17Development\FlarumSeo\Api\Resource\SeoMetaResource;
-use V17Development\FlarumSeo\ConfigureLinks;
-use V17Development\FlarumSeo\Content\SearchEngineVerification;
-use V17Development\FlarumSeo\Controller\Robots;
-use V17Development\FlarumSeo\Sitemap\SitemapController;
-use V17Development\FlarumSeo\Formatter\FormatLinks;
-use V17Development\FlarumSeo\Extend\SEO;
-use V17Development\FlarumSeo\Listeners\PageListener;
-use V17Development\FlarumSeo\Page as SeoPage;
-use V17Development\FlarumSeo\SeoMeta\SeoMeta;
+use Ernestdefoe\Seo\Api\Controllers\DeleteSocialMediaImageController;
+use Ernestdefoe\Seo\Api\Controllers\UploadSocialMediaImageController;
+use Ernestdefoe\Seo\Api\Resource\SeoMetaResource;
+use Ernestdefoe\Seo\ConfigureLinks;
+use Ernestdefoe\Seo\Content\SearchEngineVerification;
+use Ernestdefoe\Seo\Controller\Robots;
+use Ernestdefoe\Seo\Sitemap\SitemapController;
+use Ernestdefoe\Seo\Formatter\FormatLinks;
+use Ernestdefoe\Seo\Extend\SEO;
+use Ernestdefoe\Seo\Listeners\PageListener;
+use Ernestdefoe\Seo\Page as SeoPage;
+use Ernestdefoe\Seo\SeoMeta\SeoMeta;
 
 /**
  * Flarum 2 wiring for ernestdefoe/seo.

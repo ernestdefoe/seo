@@ -1,6 +1,6 @@
 <?php
 
-namespace V17Development\FlarumSeo\Listeners;
+namespace Ernestdefoe\Seo\Listeners;
 
 // Flarum classes
 use Flarum\Extension\ExtensionManager;
@@ -12,14 +12,14 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Filesystem\Cloud;
 // Laravel classes
 use Psr\Http\Message\ServerRequestInterface;
-use V17Development\FlarumSeo\Page\PageManager;
-use V17Development\FlarumSeo\SeoContentUtils;
-use V17Development\FlarumSeo\SeoMeta\SeoMeta;
-use V17Development\FlarumSeo\SeoProperties;
+use Ernestdefoe\Seo\Page\PageManager;
+use Ernestdefoe\Seo\SeoContentUtils;
+use Ernestdefoe\Seo\SeoMeta\SeoMeta;
+use Ernestdefoe\Seo\SeoProperties;
 
 /**
  * Class PageListener
- * @package V17Development\FlarumSeo\Listeners
+ * @package Ernestdefoe\Seo\Listeners
  */
 class PageListener
 {

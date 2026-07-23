@@ -1,9 +1,9 @@
 <?php
 
-namespace V17Development\FlarumSeo;
+namespace Ernestdefoe\Seo;
 
-use V17Development\FlarumSeo\Listeners\PageListener;
-use V17Development\FlarumSeo\SeoMeta\SeoMeta;
+use Ernestdefoe\Seo\Listeners\PageListener;
+use Ernestdefoe\Seo\SeoMeta\SeoMeta;
 
 /**
  * FlarumSeo Properties Extender

@@ -1,8 +1,8 @@
 <?php
 
-namespace V17Development\FlarumSeo\Subscribers;
+namespace Ernestdefoe\Seo\Subscribers;
 
-use V17Development\FlarumSeo\SeoMeta\SeoMeta;
+use Ernestdefoe\Seo\SeoMeta\SeoMeta;
 use Flarum\Post\Event as PostEvent;
 use Psr\Log\LoggerInterface;
 

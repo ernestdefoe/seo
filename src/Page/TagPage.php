@@ -1,6 +1,6 @@
 <?php
 
-namespace V17Development\FlarumSeo\Page;
+namespace Ernestdefoe\Seo\Page;
 
 use Flarum\Foundation\DispatchEventsTrait;
 use Flarum\Http\RequestUtil;
@@ -9,8 +9,8 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use V17Development\FlarumSeo\SeoMeta\SeoMeta;
-use V17Development\FlarumSeo\SeoProperties;
+use Ernestdefoe\Seo\SeoMeta\SeoMeta;
+use Ernestdefoe\Seo\SeoProperties;
 
 class TagPage implements PageDriverInterface
 {

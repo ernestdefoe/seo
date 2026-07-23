@@ -1,6 +1,6 @@
 <?php
 
-namespace V17Development\FlarumSeo\Content;
+namespace Ernestdefoe\Seo\Content;
 
 use Flarum\Frontend\Document;
 use Flarum\Settings\SettingsRepositoryInterface;

@@ -1,6 +1,6 @@
 <?php
 
-namespace V17Development\FlarumSeo;
+namespace Ernestdefoe\Seo;
 
 use s9e\TextFormatter\Configurator;
 

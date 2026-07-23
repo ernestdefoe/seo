@@ -1,6 +1,6 @@
 <?php
 
-namespace V17Development\FlarumSeo\Sitemap;
+namespace Ernestdefoe\Seo\Sitemap;
 
 use Carbon\Carbon;
 use Flarum\Discussion\Discussion;

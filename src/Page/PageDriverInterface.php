@@ -1,9 +1,9 @@
 <?php
 
-namespace V17Development\FlarumSeo\Page;
+namespace Ernestdefoe\Seo\Page;
 
 use Psr\Http\Message\ServerRequestInterface;
-use V17Development\FlarumSeo\SeoProperties;
+use Ernestdefoe\Seo\SeoProperties;
 
 interface PageDriverInterface
 {

@@ -1,12 +1,12 @@
 <?php
 
-namespace V17Development\FlarumSeo\Extend;
+namespace Ernestdefoe\Seo\Extend;
 
 use Flarum\Extension\Extension;
 use Flarum\Extend\ExtenderInterface;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Arr;
-use V17Development\FlarumSeo\Page\PageManager;
+use Ernestdefoe\Seo\Page\PageManager;
 
 class SEO implements ExtenderInterface
 {

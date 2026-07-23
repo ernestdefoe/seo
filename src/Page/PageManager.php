@@ -1,11 +1,11 @@
 <?php
 
-namespace V17Development\FlarumSeo\Page;
+namespace Ernestdefoe\Seo\Page;
 
 use Flarum\Extension\ExtensionManager;
 use Illuminate\Support\Collection;
-use V17Development\FlarumSeo\Page\PageDriverInterface;
-use V17Development\FlarumSeo\SeoExtenderManagerInterface;
+use Ernestdefoe\Seo\Page\PageDriverInterface;
+use Ernestdefoe\Seo\SeoExtenderManagerInterface;
 
 class PageManager implements SeoExtenderManagerInterface
 {

@@ -1,5 +1,5 @@
 <?php
-namespace V17Development\FlarumSeo\Controller;
+namespace Ernestdefoe\Seo\Controller;
 
 use Flarum\Settings\SettingsRepositoryInterface;
 
@@ -11,7 +11,7 @@ use Flarum\Http\UrlGenerator;
 
 /**
  * Class Robots
- * @package V17Development\FlarumSeo\Controller
+ * @package Ernestdefoe\Seo\Controller
  */
 class Robots implements RequestHandlerInterface
 {

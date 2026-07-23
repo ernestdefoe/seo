@@ -1,12 +1,12 @@
 <?php
 
-namespace V17Development\FlarumSeo\Subscribers;
+namespace Ernestdefoe\Seo\Subscribers;
 
 use Flarum\Discussion\Discussion;
 use Flarum\Discussion\Event as DiscussionEvent;
-use V17Development\FlarumSeo\SeoContentUtils;
-use V17Development\FlarumSeo\SeoMeta\SeoMeta;
-use V17Development\FlarumSeo\SeoMeta\Event\Created;
+use Ernestdefoe\Seo\SeoContentUtils;
+use Ernestdefoe\Seo\SeoMeta\SeoMeta;
+use Ernestdefoe\Seo\SeoMeta\Event\Created;
 
 /**
  * Subscribe to discussion creation, update or deleted

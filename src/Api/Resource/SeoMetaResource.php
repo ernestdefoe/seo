@@ -1,6 +1,6 @@
 <?php
 
-namespace V17Development\FlarumSeo\Api\Resource;
+namespace Ernestdefoe\Seo\Api\Resource;
 
 use Flarum\Api\Context;
 use Flarum\Api\Endpoint;
@@ -9,7 +9,7 @@ use Flarum\Api\Schema;
 use Flarum\Http\RequestUtil;
 use Illuminate\Database\Eloquent\Builder;
 use Tobyz\JsonApiServer\Context as BaseContext;
-use V17Development\FlarumSeo\SeoMeta\SeoMeta;
+use Ernestdefoe\Seo\SeoMeta\SeoMeta;
 
 /**
  * Flarum 2 JSON:API Resource replacing the v1 ListSeoMetaController +

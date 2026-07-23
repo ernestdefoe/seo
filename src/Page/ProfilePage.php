@@ -1,13 +1,13 @@
 <?php
 
-namespace V17Development\FlarumSeo\Page;
+namespace Ernestdefoe\Seo\Page;
 
 use Flarum\Http\RequestUtil;
 use Flarum\User\UserRepository;
 use Illuminate\Support\Arr;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use V17Development\FlarumSeo\SeoProperties;
+use Ernestdefoe\Seo\SeoProperties;
 
 class ProfilePage implements PageDriverInterface
 {

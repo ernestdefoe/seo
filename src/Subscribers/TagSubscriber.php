@@ -1,13 +1,13 @@
 <?php
 
-namespace V17Development\FlarumSeo\Subscribers;
+namespace Ernestdefoe\Seo\Subscribers;
 
 use Flarum\Tags\Event as TagEvent;
 use Flarum\Tags\Tag;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use V17Development\FlarumSeo\SeoContentUtils;
-use V17Development\FlarumSeo\SeoMeta\Event\Created;
-use V17Development\FlarumSeo\SeoMeta\SeoMeta;
+use Ernestdefoe\Seo\SeoContentUtils;
+use Ernestdefoe\Seo\SeoMeta\Event\Created;
+use Ernestdefoe\Seo\SeoMeta\SeoMeta;
 
 /**
  * Subscribe to tags creation, update or deleted

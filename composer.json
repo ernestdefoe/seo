@@ -17,7 +17,7 @@
   },
   "autoload": {
     "psr-4": {
-      "V17Development\\FlarumSeo\\": "src/"
+      "Ernestdefoe\\Seo\\": "src/"
     }
   },
   "require": {

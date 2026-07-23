@@ -1,6 +1,6 @@
 <?php
 
-namespace V17Development\FlarumSeo\Api\Controllers;
+namespace Ernestdefoe\Seo\Api\Controllers;
 
 use Flarum\Http\RequestUtil;
 use Flarum\Settings\SettingsRepositoryInterface;
