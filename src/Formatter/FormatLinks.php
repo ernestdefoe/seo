@@ -53,7 +53,7 @@ class FormatLinks
      * @param $xml
      * @param Request $request
      */
-    public function __invoke(Renderer $renderer, $context, $xml, Request $request = null)
+    public function __invoke(Renderer $renderer, $context, $xml, ?Request $request = null)
     {
         return Utils::replaceAttributes($xml, 'URL', function ($attributes) {
             $domain = $this->urlToDomain($attributes['url']);
