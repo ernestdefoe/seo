@@ -12,7 +12,6 @@ use Flarum\Extend;
 use Ernestdefoe\Seo\Api\Controllers\DeleteSocialMediaImageController;
 use Ernestdefoe\Seo\Api\Controllers\UploadSocialMediaImageController;
 use Ernestdefoe\Seo\Api\Resource\SeoMetaResource;
-use Ernestdefoe\Seo\ConfigureLinks;
 use Ernestdefoe\Seo\Content\SearchEngineVerification;
 use Ernestdefoe\Seo\Controller\Robots;
 use Ernestdefoe\Seo\Sitemap\SitemapController;
@@ -111,8 +110,23 @@ return [
     // mount this at /api/seo_meta/discussions-42 cleanly.
 
     (new Extend\Formatter())
-        ->render(FormatLinks::class)
-        ->configure(ConfigureLinks::class),
+        /*
+         * 🚨 No ->configure(ConfigureLinks::class) here any more.
+         *
+         * It appended a template normalizer that stamped rel="{@rel}" and
+         * target="{@target}" onto every <a> in every template. Flarum 2 core
+         * now does that itself for the URL tag (Formatter::configureExternalLinks
+         * copies @rel, @target and @class onto the link), so the two stacked:
+         * core's <xsl:copy-of> emits the attribute conditionally, the normalizer's
+         * attribute-value template emits it unconditionally, and every link on
+         * the forum rendered with rel and target TWICE — invalid HTML, and it
+         * also emitted empty rel="" target="" on links that had neither.
+         *
+         * FormatLinks below only ever sets these on URL tags
+         * (Utils::replaceAttributes(..., 'URL', ...)), which is exactly the tag
+         * core already handles, so nothing is lost by dropping it.
+         */
+        ->render(FormatLinks::class),
 
     /**
      * Per-discussion SeoMeta relationship (was Extend\Model in v1, but in
