@@ -108,6 +108,24 @@ class PageListener
     }
 
     /**
+     * Has another extension already written this page's Open Graph tags?
+     *
+     * `og:title` is the marker because it is the one tag every description
+     * has: a page can legitimately have no image and no description, but
+     * nothing sets out to describe a page without naming it.
+     */
+    private function alreadyDescribed(): bool
+    {
+        foreach ($this->flarumDocument->head as $entry) {
+            if (is_string($entry) && str_contains($entry, 'property="og:title"')) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Default site meta tags
      * Available for all webpages
      */
@@ -120,17 +138,35 @@ class PageListener
         $applicationSeoSocialMediaImage = $this->settings->get('seo_social_media_image_path');
         $twitterCardLargeSize = $this->settings->get('seo_twitter_card_size', 'large') === 'large';
 
-        $this
-            // Add application name
-            ->setMetaTag('application-name', $applicationName)
-            ->setMetaPropertyTag('og:site_name', $applicationName)
-            ->setMetaPropertyTag('og:type', 'website')
+        // Add application name
+        $this->setMetaTag('application-name', $applicationName)
 
             // Robots, follow please! :)
-            ->setMetaTag('robots', 'index, follow')
+            ->setMetaTag('robots', 'index, follow');
 
-            // Twitter card
-            ->setMetaTag('twitter:card', $twitterCardLargeSize ? 'summary_large_image' : 'summary');
+        /*
+         * 🚨 The SOCIAL tags are skipped when another extension has already
+         * described this page.
+         *
+         * This listener runs on every document, including routes that belong
+         * to somebody else — Atrium's gallery pages, for one, which set an
+         * og:type of `article` and an og:image of the actual photograph. The
+         * generic pair below would then add a second og:type of `website` and
+         * a second og:site_name on top of that, and the page would tell
+         * Facebook one thing and Slack another. Nothing errors; it only shows
+         * up in somebody's link preview.
+         *
+         * Only these three are skipped. `application-name`, `robots` and the
+         * schema.org block below are this extension's own job on every page,
+         * and an extension that writes og:title is not claiming to do them —
+         * so this is a guard around three lines, NOT an early return.
+         */
+        if (! $this->alreadyDescribed()) {
+            $this
+                ->setMetaPropertyTag('og:site_name', $applicationName)
+                ->setMetaPropertyTag('og:type', 'website')
+                ->setMetaTag('twitter:card', $twitterCardLargeSize ? 'summary_large_image' : 'summary');
+        }
 
         // Add application information
         $this->setSchemaJson('publisher', [
