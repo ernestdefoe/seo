@@ -33,8 +33,8 @@ app.initializers.add("ernestdefoe-seo", () => {
     }
   );
 
-  // Register SeoMeta model
-  app.store.models.seoMeta = SeoMeta;
+  // Register SeoMeta model under its API type, so the store accepts seo_meta records
+  app.store.models.seo_meta = SeoMeta;
 
   // Register SeoMeta relations
   Discussion.prototype.seoMeta = Model.hasOne("seoMeta");

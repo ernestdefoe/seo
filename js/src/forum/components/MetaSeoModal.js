@@ -9,11 +9,11 @@ import countKeywords from "../../admin/utils/countKeywords";
 import clsx from "clsx";
 
 // Translator prefix for every UI string in this modal. All visible
-// strings live under `ernestdefoe-seo.admin.meta_seo_modal.*` in the
+// strings live under `ernestdefoe-seo.forum.meta_seo_modal.*` in the
 // locale files. Previously every label was hardcoded English inline,
 // which silently made the eight non-English locale files this
 // extension ships unreachable for the admin meta-editing surface.
-const I18N_PREFIX = "ernestdefoe-seo.admin.meta_seo_modal";
+const I18N_PREFIX = "ernestdefoe-seo.forum.meta_seo_modal";
 const t = (key, vars) =>
   app.translator.trans(`${I18N_PREFIX}.${key}`, vars);
 
