@@ -5,6 +5,7 @@ namespace Ernestdefoe\Seo\Page;
 use FoF\Pages\PageRepository;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Arr;
+use Flarum\Http\RequestUtil;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Ernestdefoe\Seo\SeoMeta\SeoMeta;
@@ -66,7 +67,7 @@ class PageExtensionPage implements PageDriverInterface
         $pageId = Arr::get($request->getQueryParams(), 'id');
 
         try {
-            $page = $this->container->make(PageRepository::class)->findOrFail($pageId);
+            $page = $this->container->make(PageRepository::class)->findOrFail($pageId, RequestUtil::getActor($request));
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             // Do nothing, no model found
             return;

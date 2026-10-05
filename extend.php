@@ -167,7 +167,9 @@ return [
             // surfaces as a generic 404.
             Schema\Relationship\ToOne::make('seoMeta')
                 ->type('seo_meta')
-                ->includable(),
+                ->includable()
+                // Keywords and robots flags are the SEO editors' business.
+                ->visible(fn ($discussion, $context) => $context->getActor()->hasPermissionLike('seo.canConfigure')),
         ])
         ->endpoint(Endpoint\Show::class, fn (Endpoint\Show $endpoint) => $endpoint->eagerLoad('seoMeta'))
         ->endpoint(Endpoint\Index::class, fn (Endpoint\Index $endpoint) => $endpoint->eagerLoad('seoMeta')),
