@@ -13,6 +13,7 @@ use Flarum\Http\SlugManager;
 use Flarum\Post\Post;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\Tags\Tag;
+use Flarum\User\Guest;
 use Flarum\User\User;
 use Flarum\User\UserRepository;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -200,11 +201,20 @@ class DiscussionBestAnswerPage implements PageDriverInterface
 
         $mainEntity['suggestedAnswer'] = [];
 
+        /*
+         * 🚨 Structured data is for search engines, so it carries only what a
+         * signed-out visitor can read. A bare $discussion->posts() also
+         * returned moderator-hidden replies and replies awaiting approval,
+         * and put their full text in the public JSON-LD.
+         */
+        $guest = new Guest();
+
         // The accepted answer can sit anywhere in a long thread, so fetch it by
         // id with a targeted query rather than hoping it falls inside the capped
         // suggested-answers set below.
         if ($bestAnswerId) {
             $acceptedPost = $discussion->posts()
+                ->whereVisibleTo($guest)
                 ->with('user')
                 ->withCount('likes')
                 ->where('id', $bestAnswerId)
@@ -222,6 +232,8 @@ class DiscussionBestAnswerPage implements PageDriverInterface
         // without hydrating every Like row.
         /** @var Collection<Post> $posts */
         $posts = $discussion->posts()
+            ->whereVisibleTo($guest)
+            ->where('type', 'comment')
             ->with('user')
             ->withCount('likes')
             ->where('number', '>', '1')
