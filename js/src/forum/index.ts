@@ -2,12 +2,9 @@ import app from "flarum/forum/app";
 import DiscussionControls from "flarum/forum/utils/DiscussionControls";
 import Button from "flarum/common/components/Button";
 import { extend } from "flarum/common/extend";
-import MetaSeoModal from "../common/Components/MetaSeoModal";
 import SeoMeta from "../common/Models/SeoMeta";
 import Discussion from "flarum/common/models/Discussion";
 import Model from "flarum/common/Model";
-
-export * from "../common/extend";
 
 app.initializers.add("ernestdefoe-seo", () => {
   extend(
@@ -22,7 +19,7 @@ app.initializers.add("ernestdefoe-seo", () => {
           {
             icon: "fas fa-search",
             onclick: () =>
-              app.modal.show(MetaSeoModal, {
+              app.modal.show(() => import("./components/MetaSeoModal"), {
                 objectType: "discussions",
                 objectId: discussion.id(),
               }),

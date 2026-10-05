@@ -89,6 +89,8 @@ return [
         ->content(PageListener::class)
         ->content(SearchEngineVerification::class)
         ->js(__DIR__ . '/js/dist/forum.js')
+        // The SEO modal is its own chunk, loaded when a moderator opens it.
+        ->jsDirectory(__DIR__ . '/js/dist/forum')
         ->css(__DIR__ . '/less/Forum.less'),
 
     (new Extend\Frontend('admin'))
