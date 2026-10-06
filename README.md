@@ -124,10 +124,9 @@ configure:
 
 ## Support
 
-Questions, bug reports, and feature requests:
-
-- **Support forum:** https://ernestdefoe.online
-- **Issues:** https://github.com/ernestdefoe/seo/issues
+- **Support forum:** [SEO for Flarum 2 on ernestdefoe.online](https://ernestdefoe.online/d/14)
+- **Flarum community:** [SEO for Flarum 2 on discuss.flarum.org](https://discuss.flarum.org/d/39330-seo-for-flarum-2)
+- **Bug reports:** [GitHub issues](https://github.com/ernestdefoe/seo/issues)
 
 ## Discuss
 
