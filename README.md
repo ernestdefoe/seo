@@ -129,6 +129,10 @@ Questions, bug reports, and feature requests:
 - **Support forum:** https://ernestdefoe.online
 - **Issues:** https://github.com/ernestdefoe/seo/issues
 
+## Discuss
+
+Questions, ideas and release notes: [SEO on discuss.flarum.org](https://discuss.flarum.org/d/39330-seo-for-flarum-2).
+
 ## License & credits
 
 [MIT](LICENSE.md). Upstream credit:
