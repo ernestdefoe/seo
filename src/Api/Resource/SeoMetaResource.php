@@ -19,10 +19,10 @@ use Ernestdefoe\Seo\SeoMeta\SeoMeta;
  * + writable allowlist instead of four scattered classes manually
  * stitched together).
  *
- * Authorization: every endpoint is admin-only via ->can('administrate').
- * Field-level writability is gated the same way (any actor-derived
- * field setter has the same guard). The Index endpoint paginates the
- * full table for the admin's "SEO entries" management page.
+ * Authorization: Show and Update need seo.canConfigure (the permission
+ * that shows the forum's "Configure SEO" control; admins have it), Index
+ * is admin-only via ->can('administrate'). The Index endpoint paginates
+ * the full table for the admin's "SEO entries" management page.
  *
  * Mass-assignment defense (CLAUDE.md §7): the Schema writable() allowlist
  * is the only path for client input to reach the model — `objectType`
@@ -86,8 +86,8 @@ class SeoMetaResource extends AbstractDatabaseResource
 
     public function scope(Builder $query, BaseContext $context): void
     {
-        // Admin-only resource; no per-actor row gating beyond the
-        // endpoint-level ->can('administrate'). Sorting by id desc by
+        // No per-actor row gating beyond the endpoint-level can()
+        // checks. Sorting by id desc by
         // default matches the v1 ListController's `latest('created_at')`
         // intent.
         $query->orderByDesc('id');
@@ -100,11 +100,13 @@ class SeoMetaResource extends AbstractDatabaseResource
                 ->can('administrate')
                 ->paginate(),
 
+            // The forum's "Configure SEO" control is shown to holders of
+            // seo.canConfigure, so they (and admins) open and save here.
             Endpoint\Show::make()
-                ->can('administrate'),
+                ->can('seo.canConfigure'),
 
             Endpoint\Update::make()
-                ->can('administrate'),
+                ->can('seo.canConfigure'),
         ];
     }
 
