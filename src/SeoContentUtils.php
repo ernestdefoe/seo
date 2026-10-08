@@ -18,7 +18,9 @@ class SeoContentUtils
      */
     public function generateDescriptionFromContent(?string $content): string
     {
-        $description = strip_tags((string) $content);
+        // Rendered HTML escapes & < > " — decode them, or the description
+        // carries "&amp;" into meta tags (escaped again there) and JSON-LD.
+        $description = html_entity_decode(strip_tags((string) $content), ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
         return trim(preg_replace('/\s+/', ' ', mb_substr($description, 0, 157)))
             . (mb_strlen($description) > 157 ? '...' : '');

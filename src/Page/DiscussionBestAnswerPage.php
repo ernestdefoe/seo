@@ -180,7 +180,7 @@ class DiscussionBestAnswerPage implements PageDriverInterface
             // Schema.org payload that Google's structured-data crawler
             // reads. DiscussionSubscriber.php already uses
             // formatContent() for the same purpose; keep it consistent.
-            'text' => $firstPost !== null ? strip_tags($firstPost->formatContent()) : '',
+            'text' => $firstPost !== null ? html_entity_decode(strip_tags($firstPost->formatContent()), ENT_QUOTES | ENT_HTML5, 'UTF-8') : '',
             'dateCreated' => $seoMeta->created_at,
             'author' => [
                 "@type" => "Person",
@@ -265,7 +265,7 @@ class DiscussionBestAnswerPage implements PageDriverInterface
     {
         return [
             '@type' => 'Answer',
-            'text' => strip_tags($post->formatContent()),
+            'text' => html_entity_decode(strip_tags($post->formatContent()), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
             'dateCreated' => $post->created_at->toIso8601String(),
             'url' => $this->urlGenerator->to('forum')->route('discussion', ['id' => $discussion->id . '-' . $discussion->slug, 'near' => $post->number]),
             'author' => [
