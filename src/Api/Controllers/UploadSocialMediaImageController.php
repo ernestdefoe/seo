@@ -60,9 +60,11 @@ class UploadSocialMediaImageController implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        try {
-            RequestUtil::getActor($request)->assertAdmin();
+        // Outside the try: the catch-all below would turn a refusal into a
+        // logged "Upload failed." 500.
+        RequestUtil::getActor($request)->assertAdmin();
 
+        try {
             /** @var UploadedFileInterface|null $file */
             $file = Arr::get($request->getUploadedFiles(), 'seo_social_media_image');
             if (! $file || $file->getError() !== UPLOAD_ERR_OK) {
