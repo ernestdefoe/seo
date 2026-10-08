@@ -3,6 +3,7 @@
 namespace Ernestdefoe\Seo\Subscribers;
 
 use Ernestdefoe\Seo\SeoMeta\SeoMeta;
+use Illuminate\Contracts\Events\Dispatcher;
 use Flarum\Post\Event as PostEvent;
 use Psr\Log\LoggerInterface;
 
@@ -21,9 +22,9 @@ class PostSubscriber
     /**
      * Subscribe to events
      * 
-     * @param $events
+     * @param Dispatcher $events
      */
-    public function subscribe($events)
+    public function subscribe($events): void
     {
         $events->listen(PostEvent\Deleting::class, [$this, 'onModelEvent']);
         $events->listen(PostEvent\Posted::class, [$this, 'onModelEvent']);
@@ -33,9 +34,9 @@ class PostSubscriber
     /**
      * Handle model event
      *
-     * @param $event
+     * @param PostEvent\Deleting|PostEvent\Posted|PostEvent\Revised $event
      */
-    public function onModelEvent($event)
+    public function onModelEvent($event): void
     {
         // The discussion relationship is lazy-loaded and can be null on
         // an orphaned post — one whose parent Discussion row was

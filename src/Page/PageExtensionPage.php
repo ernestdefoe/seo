@@ -63,7 +63,7 @@ class PageExtensionPage implements PageDriverInterface
     public function handle(
         ServerRequestInterface $request,
         SeoProperties $properties
-    ) {
+    ): void {
         $pageId = Arr::get($request->getQueryParams(), 'id');
 
         try {

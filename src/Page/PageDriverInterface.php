@@ -21,6 +21,8 @@ interface PageDriverInterface
 
     /**
      * Handle page SEO
+     *
+     * @return void
      */
     public function handle(ServerRequestInterface $request, SeoProperties $seo);
 }

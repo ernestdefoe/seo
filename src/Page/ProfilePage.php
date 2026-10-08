@@ -47,7 +47,7 @@ class ProfilePage implements PageDriverInterface
     public function handle(
         ServerRequestInterface $request,
         SeoProperties $properties
-    ) {
+    ): void {
         $username = Arr::get($request->getQueryParams(), 'username');
 
         // Scope the lookup to the requesting actor's visibility so that, on a

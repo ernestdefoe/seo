@@ -9,6 +9,7 @@ use Flarum\Foundation\DispatchEventsTrait;
 use Flarum\Http\RequestUtil;
 use Flarum\Http\UrlGenerator;
 use Flarum\Http\SlugManager;
+use Flarum\Post\CommentPost;
 use Flarum\Post\Post;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\Tags\Tag;
@@ -54,7 +55,7 @@ class DiscussionBestAnswerPage implements PageDriverInterface
     protected $urlGenerator;
 
     /**
-     * @var Discussion
+     * @var DiscussionPage
      */
     protected $discussionFallback;
 
@@ -64,11 +65,15 @@ class DiscussionBestAnswerPage implements PageDriverInterface
     protected $slugManager;
 
     /**
+     * @var Dispatcher
+     */
+    protected $events;
+
+    /**
      * @param SettingsRepositoryInterface $settingsRepositoryInterface
-     * @param TranslatorInterface $translator
      * @param ExtensionManager $extensionManager
      * @param UrlGenerator $urlGenerator
-     * @param Discussion $discussionFallback
+     * @param DiscussionPage $discussionFallback
      */
     public function __construct(
         SettingsRepositoryInterface $settingsRepositoryInterface,
@@ -105,7 +110,7 @@ class DiscussionBestAnswerPage implements PageDriverInterface
     public function handle(
         ServerRequestInterface $request,
         SeoProperties $properties
-    ) {
+    ): void {
         // Simple discussion tags is set up
         if ($this->settingsRepositoryInterface->get('seo_post_crawler', 0) == 0) return;
 
@@ -134,7 +139,7 @@ class DiscussionBestAnswerPage implements PageDriverInterface
         // Fallback to simple discussions for not-answer tags
         $enableBestAnswer = $this->extensionManager->isEnabled('fof-best-answer');
 
-        /** @var Collection<Tag> $discussionTags */
+        /** @var Collection<int, Tag> $discussionTags */
         $discussionTags = $discussion->tags;
 
         if (!$enableBestAnswer || !$discussionTags->contains(fn(Tag $tag) => (bool)$tag->is_qna )) {
@@ -163,7 +168,7 @@ class DiscussionBestAnswerPage implements PageDriverInterface
         $properties->generateTagsFromMetaData($seoMeta);
 
         // Get posted on and Last posted on
-        $bestAnswerId = $enableBestAnswer ? $discussion->best_answer_post_id : null;
+        $bestAnswerId = $discussion->best_answer_post_id;
 
         // Update topic url
         $properties->setUrl($this->urlGenerator->to('forum')->route('discussion', ['id' => $discussion->id . '-' . $discussion->slug]), false);
@@ -180,7 +185,7 @@ class DiscussionBestAnswerPage implements PageDriverInterface
             // Schema.org payload that Google's structured-data crawler
             // reads. DiscussionSubscriber.php already uses
             // formatContent() for the same purpose; keep it consistent.
-            'text' => $firstPost !== null ? html_entity_decode(strip_tags($firstPost->formatContent()), ENT_QUOTES | ENT_HTML5, 'UTF-8') : '',
+            'text' => $firstPost instanceof CommentPost ? html_entity_decode(strip_tags($firstPost->formatContent()), ENT_QUOTES | ENT_HTML5, 'UTF-8') : '',
             'dateCreated' => $seoMeta->created_at,
             'author' => [
                 "@type" => "Person",
@@ -223,7 +228,7 @@ class DiscussionBestAnswerPage implements PageDriverInterface
                 ->where('number', '>', '1')
                 ->first();
 
-            if ($acceptedPost && !$acceptedPost->is_private && $acceptedPost->type === 'comment') {
+            if ($acceptedPost instanceof CommentPost && !$acceptedPost->is_private) {
                 $mainEntity['acceptedAnswer'] = $this->buildAnswer($acceptedPost, $discussion, $enableLikes);
             }
         }
@@ -232,7 +237,7 @@ class DiscussionBestAnswerPage implements PageDriverInterface
         // `user` so the per-post author lookup isn't N+1; withCount('likes')
         // (with flarum/likes) exposes $post->likes_count as an aggregate so
         // upvoteCount reads it without hydrating every Like row.
-        /** @var Collection<Post> $posts */
+        /** @var Collection<int, Post> $posts */
         $posts = $discussion->posts()
             ->whereVisibleTo($guest)
             ->where('type', 'comment')
@@ -245,7 +250,7 @@ class DiscussionBestAnswerPage implements PageDriverInterface
 
         foreach ($posts as $post) {
             /** @var Post $post */
-            if ($post->is_private || $post->type !== 'comment') {
+            if ($post->is_private || ! $post instanceof CommentPost) {
                 continue;
             }
 
@@ -262,7 +267,7 @@ class DiscussionBestAnswerPage implements PageDriverInterface
      *
      * @return array<string, mixed>
      */
-    private function buildAnswer(Post $post, Discussion $discussion, bool $enableLikes): array
+    private function buildAnswer(CommentPost $post, Discussion $discussion, bool $enableLikes): array
     {
         return [
             '@type' => 'Answer',

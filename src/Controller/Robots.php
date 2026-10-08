@@ -15,7 +15,10 @@ use Flarum\Http\UrlGenerator;
  */
 class Robots implements RequestHandlerInterface
 {
+    /** @var SettingsRepositoryInterface */
     protected $settings;
+
+    /** @var UrlGenerator */
     protected $url;
 
     /**
@@ -31,10 +34,7 @@ class Robots implements RequestHandlerInterface
         $this->url = $url;
     }
 
-    /**
-     * @return string
-     */
-    private function output()
+    private function output(): string
     {
         $output = '';
 
@@ -60,7 +60,6 @@ class Robots implements RequestHandlerInterface
 
     /**
      * @param ServerRequestInterface $request
-     * @return mixed
      */
     public function handle(ServerRequestInterface $request) : ResponseInterface
     {

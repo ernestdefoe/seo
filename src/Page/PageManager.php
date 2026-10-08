@@ -41,11 +41,12 @@ class PageManager implements SeoExtenderManagerInterface
     /**
      * Get all extenders
      */
-    public function getExtenders(string $routeName = null): array
+    /** @return array<string, PageDriverInterface> */
+    public function getExtenders(?string $routeName = null): array
     {
         return $this->getActiveExtenders()
             ->filter(function (PageDriverInterface $driver) use ($routeName) {
-                return $routeName === null || in_array($routeName, $driver->handleRoutes() ?? []);
+                return $routeName === null || in_array($routeName, $driver->handleRoutes());
             })
             ->toArray();
     }

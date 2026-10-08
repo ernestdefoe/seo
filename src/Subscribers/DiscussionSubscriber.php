@@ -4,8 +4,10 @@ namespace Ernestdefoe\Seo\Subscribers;
 
 use Flarum\Discussion\Discussion;
 use Flarum\Discussion\Event as DiscussionEvent;
+use Flarum\Post\CommentPost;
 use Ernestdefoe\Seo\SeoContentUtils;
 use Ernestdefoe\Seo\SeoMeta\SeoMeta;
+use Illuminate\Contracts\Events\Dispatcher;
 use Ernestdefoe\Seo\SeoMeta\Event\Created;
 
 /**
@@ -20,9 +22,9 @@ class DiscussionSubscriber
     /**
      * Subscribe to events
      * 
-     * @param $events
+     * @param Dispatcher $events
      */
-    public function subscribe($events)
+    public function subscribe($events): void
     {
         $events->listen(DiscussionEvent\Deleting::class, [$this, 'onModelEvent']);
         $events->listen(DiscussionEvent\Started::class, [$this, 'onModelEvent']);
@@ -33,9 +35,9 @@ class DiscussionSubscriber
     /**
      * Handle model event
      *
-     * @param $event
+     * @param DiscussionEvent\Deleting|DiscussionEvent\Started|DiscussionEvent\Renamed $event
      */
-    public function onModelEvent($event)
+    public function onModelEvent($event): void
     {
         // Find meta
         $meta = SeoMeta::findOneByModel($event->discussion);
@@ -71,7 +73,7 @@ class DiscussionSubscriber
      * 
      * @param Created $event
      */
-    public function onMetaCreated(Created $event)
+    public function onMetaCreated(Created $event): void
     {
         // Only update meta data if object type matches
         if ($event->objectType !== 'discussions') return;
@@ -93,7 +95,7 @@ class DiscussionSubscriber
     /**
      * Public function to update 
      */
-    public function updateMeta($meta, $discussion)
+    public function updateMeta(SeoMeta $meta, Discussion $discussion): void
     {
         $meta->title = $discussion->title;
 
@@ -109,7 +111,7 @@ class DiscussionSubscriber
         }
 
         // Set discussion description and image
-        if ($firstPost) {
+        if ($firstPost instanceof CommentPost) {
             $content = $firstPost->formatContent();
 
             // Set page description

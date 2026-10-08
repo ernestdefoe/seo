@@ -80,7 +80,7 @@ class SeoMeta extends AbstractModel
         'robots_nosnippet' => 'boolean',
     ];
 
-    public static function build(string $objectType, int $objectId, bool $autoUpdate = true)
+    public static function build(string $objectType, int $objectId, bool $autoUpdate = true): static
     {
         $seoMeta = new static();
         $seoMeta->object_id = $objectId;
@@ -110,9 +110,9 @@ class SeoMeta extends AbstractModel
      * Find the SEO meta by object type
      *
      * @param string $objectType Name of the object
-     * @param string $objectId ID of the object
+     * @param int $objectId ID of the object
      */
-    public static function findByObjectTypeOrFail(string $objectType, int $objectId): Model
+    public static function findByObjectTypeOrFail(string $objectType, int $objectId): self
     {
         return self::where([
             ['object_type', '=', $objectType],
@@ -124,9 +124,9 @@ class SeoMeta extends AbstractModel
      * Find the SEO meta by object type
      * 
      * @param string $objectType Name of the object
-     * @param string $objectId ID of the object
+     * @param int $objectId ID of the object
      */
-    public static function findByObjectTypeOrCreate(string $objectType, int $objectId, callable|null $fillables = null): Model
+    public static function findByObjectTypeOrCreate(string $objectType, int $objectId, callable|null $fillables = null): self
     {
         return self::selectOrInsert($objectType, $objectId, $fillables);
     }
@@ -143,7 +143,7 @@ class SeoMeta extends AbstractModel
      * DB error surface. The "Created" event fires only for the request that
      * actually inserted, which is the desired semantics.
      */
-    private static function selectOrInsert(string $objectType, int $objectId, callable|null $fillables): Model
+    private static function selectOrInsert(string $objectType, int $objectId, callable|null $fillables): self
     {
         $existing = self::where([
             ['object_type', '=', $objectType],
@@ -184,10 +184,9 @@ class SeoMeta extends AbstractModel
      * Could be used to add dynamic tags to pages that do not have a database row
      * For example: a blog home/overview page, knowledge base page, tags overview page etc.
      * 
-     * @param string $objectType Name of the object
-     * @param string $objectId ID of the object
+     * @param string $pageSlug Slug of the page
      */
-    public static function findOrCreateBySlug(string $pageSlug, callable|null $fillables = null): Model
+    public static function findOrCreateBySlug(string $pageSlug, callable|null $fillables = null): self
     {
         return self::findByObjectTypeOrCreate(str_replace("-", "_", $pageSlug), -1, $fillables);
     }
@@ -198,7 +197,7 @@ class SeoMeta extends AbstractModel
      * 
      * @param Model $model The model
      */
-    public static function findOneByModel(Model $model): ?Model
+    public static function findOneByModel(Model $model): ?self
     {
         return self::where([
             'object_type' => $model->getTable(),
@@ -211,7 +210,7 @@ class SeoMeta extends AbstractModel
      * 
      * @param Model $model The model
      */
-    public static function buildByModel(Model $model): ?Model
+    public static function buildByModel(Model $model): self
     {
         return self::build($model->getTable(), $model->getKey());
     }
@@ -221,7 +220,8 @@ class SeoMeta extends AbstractModel
      * 
      * @param Model $model The model
      */
-    public static function findByModelOrCreate(Model $model, array|callable $fillables = []): Model
+    /** @param array<string, mixed>|callable $fillables */
+    public static function findByModelOrCreate(Model $model, array|callable $fillables = []): self
     {
         $objectType = $model->getTable();
         $objectId   = $model->getKey();

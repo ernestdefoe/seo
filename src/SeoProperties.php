@@ -10,7 +10,7 @@ use Ernestdefoe\Seo\SeoMeta\SeoMeta;
  */
 class SeoProperties
 {
-    // SEO container
+    /** @var PageListener|null SEO container */
     private $container = null;
 
     private SeoContentUtils $contentUtils;
@@ -72,6 +72,7 @@ class SeoProperties
     /**
      * Generate page description
      */
+    /** @param string|null $content */
     public function generateDescriptionFromContent($content): string
     {
         return $this->contentUtils->generateDescriptionFromContent($content);
@@ -81,7 +82,7 @@ class SeoProperties
      * Page full URL
      *
      * @param string $url The path or url of the page (if it is the full url, set $addApplicationUrl to false)
-     * @param bool $addApplicationUrl Adds application before the URL if true
+     * @param bool $prependApplicationUrl Adds application before the URL if true
      */
     public function setUrl(string $url, bool $prependApplicationUrl = true): self
     {
@@ -234,17 +235,19 @@ class SeoProperties
      *
      * @param string $path
      */
-    public function withApplicationPath(string $path)
+    public function withApplicationPath(string $path): string
     {
+        if ($this->container === null) self::throwError("withApplicationPath");
+
         return $this->container->getApplicationPath($path);
     }
 
-    public function getImageFromContent(?string $content = null)
+    public function getImageFromContent(?string $content = null): ?string
     {
         return $this->contentUtils->getImageFromContent($content);
     }
 
-    public function getEstimatedReadingTime(string $content = null)
+    public function getEstimatedReadingTime(?string $content = null): int
     {
         return $this->contentUtils->getEstimatedReadingTime($content);
     }
@@ -252,8 +255,11 @@ class SeoProperties
     /**
      * Generates a
      */
+    /** @param array<int, array<string, mixed>> $tags */
     public function generateSchemaBreadcrumb(array $tags): self
     {
+        if ($this->container === null) self::throwError("generateSchemaBreadcrumb");
+
         $this->container->setSchemaBreadcrumb($tags);
 
         return $this;
@@ -262,8 +268,10 @@ class SeoProperties
     /**
      * Generate default tags from meta
      */
-    public function generateTagsFromMetaData(SeoMeta $data)
+    public function generateTagsFromMetaData(SeoMeta $data): self
     {
+        if ($this->container === null) self::throwError("generateTagsFromMetaData");
+
         $this->container->generateTagsFromMetaData($data);
 
         return $this;
@@ -272,7 +280,7 @@ class SeoProperties
     /**
      * Container was not yet initialized
      */
-    private static function throwError($caller)
+    private static function throwError(string $caller): never
     {
         throw new \Exception("SeoProperties::" . $caller . "(..): You're doing it wrong, container was improperly initialized. Please review Flarum SEO documentation.");
     }

@@ -8,6 +8,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Ernestdefoe\Seo\SeoContentUtils;
 use Ernestdefoe\Seo\SeoMeta\Event\Created;
 use Ernestdefoe\Seo\SeoMeta\SeoMeta;
+use Illuminate\Contracts\Events\Dispatcher;
 
 /**
  * Subscribe to tags creation, update or deleted
@@ -24,9 +25,9 @@ class TagSubscriber
     /**
      * Subscribe function
      * 
-     * @param $events
+     * @param Dispatcher $events
      */
-    public function subscribe($events)
+    public function subscribe($events): void
     {
         $events->listen(\Flarum\Tags\Event\Deleting::class, [$this, 'onModelEvent']);
         $events->listen(\Flarum\Tags\Event\Saving::class, [$this, 'onModelEvent']);
@@ -36,9 +37,9 @@ class TagSubscriber
     /**
      * Handle model event
      *
-     * @param $event
+     * @param TagEvent\Deleting|TagEvent\Saving $event
      */
-    public function onModelEvent($event)
+    public function onModelEvent($event): void
     {
         // Find meta
         $meta = SeoMeta::findOneByModel($event->tag);
@@ -74,7 +75,7 @@ class TagSubscriber
      * 
      * @param Created $event
      */
-    public function onMetaCreated(Created $event)
+    public function onMetaCreated(Created $event): void
     {
         // Only update meta data if object type matches
         if ($event->objectType !== 'tags') return;
@@ -96,7 +97,7 @@ class TagSubscriber
     /**
      * Public function to update 
      */
-    public function updateMeta($meta, $tag)
+    public function updateMeta(SeoMeta $meta, Tag $tag): void
     {
         $meta->title = $tag->name;
 

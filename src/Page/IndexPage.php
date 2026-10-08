@@ -39,7 +39,7 @@ class IndexPage implements PageDriverInterface
     public function handle(
         ServerRequestInterface $request,
         SeoProperties $properties
-    ) {
+    ): void {
         $routeName = $request->getAttribute('routeName');
 
         $properties->setDescription($this->settings->get('forum_description'));

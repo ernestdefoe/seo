@@ -10,16 +10,16 @@ use Ernestdefoe\Seo\Page\PageManager;
 
 class SEO implements ExtenderInterface
 {
-    // Extender list
+    /** @var array<string, class-string<\Ernestdefoe\Seo\Page\PageDriverInterface>> */
     protected $extenders = [];
 
     /**
      * Register a new extender
      *
      * @param string $name Unique extender name
-     * @param string $extender Extender class
+     * @param class-string<\Ernestdefoe\Seo\Page\PageDriverInterface> $extender Extender class
      */
-    public function addExtender(string $name, string $extender)
+    public function addExtender(string $name, string $extender): self
     {
         $this->extenders[$name] = $extender;
 
@@ -31,7 +31,7 @@ class SEO implements ExtenderInterface
      *
      * @param string $name Extender name
      */
-    public function removeExtender(string $name)
+    public function removeExtender(string $name): self
     {
         // Forget extender
         Arr::forget($this->extenders, $name);
@@ -41,8 +41,6 @@ class SEO implements ExtenderInterface
 
     /**
      * Extender
-     *
-     * @param
      */
     public function extend(Container $container, ?Extension $extension = null): void
     {

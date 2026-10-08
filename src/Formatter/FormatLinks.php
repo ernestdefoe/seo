@@ -49,11 +49,11 @@ class FormatLinks
 
     /**
      * @param Renderer $renderer
-     * @param $context
-     * @param $xml
+     * @param mixed $context
+     * @param string $xml
      * @param Request $request
      */
-    public function __invoke(Renderer $renderer, $context, $xml, ?Request $request = null)
+    public function __invoke(Renderer $renderer, $context, $xml, ?Request $request = null): string
     {
         return Utils::replaceAttributes($xml, 'URL', function ($attributes) {
             $domain = $this->urlToDomain($attributes['url']);
@@ -75,8 +75,8 @@ class FormatLinks
      *
      * @param string $domain
      */
-    private function addNofollow(string $domain) {
-        return !isset($domain) || !in_array($domain, $this->doFollowList);
+    private function addNofollow(string $domain): bool {
+        return !in_array($domain, $this->doFollowList);
     }
 
     /**
@@ -84,14 +84,15 @@ class FormatLinks
      *
      * @param string $domain
      */
-    private function openInNewTab(string $domain) {
-        return !isset($domain) || $this->internalDomain != $domain;
+    private function openInNewTab(string $domain): bool {
+        return $this->internalDomain != $domain;
     }
 
     /**
      * Load the do-follow list
      */
-    public function getDoFollowList()
+    /** @return list<string> */
+    public function getDoFollowList(): array
     {
         return json_decode($this->settings->get("seo_dofollow_domains", ""), true) ?? [];
     }
@@ -99,7 +100,7 @@ class FormatLinks
     /**
      * Get domain (and strip subdomains, if any)
      */
-    private function urlToDomain($url) {
+    private function urlToDomain(string $url): string {
         // Parse URL
         $url = parse_url($url);
 
@@ -121,7 +122,7 @@ class FormatLinks
     /**
      * Check if this domain is a subdomain
      */
-    private function isSubdomain($domain) {
+    private function isSubdomain(string $domain): bool {
         return substr_count($domain, '.') > 1;
     }
 }

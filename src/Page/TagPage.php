@@ -17,6 +17,11 @@ class TagPage implements PageDriverInterface
     use DispatchEventsTrait;
 
     /**
+     * @var Dispatcher
+     */
+    protected $events;
+
+    /**
      * @var TranslatorInterface
      */
     protected $translator;
@@ -52,7 +57,7 @@ class TagPage implements PageDriverInterface
     public function handle(
         ServerRequestInterface $request,
         SeoProperties $properties
-    ) {
+    ): void {
         $tagId = Arr::get($request->getQueryParams(), 'slug');
 
         // I do support it, but it didn't work

@@ -33,24 +33,34 @@ class PageListener
      */
     protected $pageManager;
 
-    // Config
+    /** @var string */
     protected $applicationUrl;
 
-    // Document
+    /** @var Document */
     protected $flarumDocument;
 
+    /** @var string|null */
     private $canonicalUrl = null;
 
-    // Schema.org LD JSON
+    /**
+     * Schema.org LD JSON
+     *
+     * @var array<string, mixed>
+     */
     protected $schemaArray = [
         '@context' => 'http://schema.org',
         '@type' => 'WebPage'
     ];
 
+    /** @var array<string, mixed> */
     protected $schemaBreadcrumb = [];
 
-    // Meta data with property tags
-    protected $metaProperty;
+    /**
+     * Meta data with property tags
+     *
+     * @var array<string, mixed>
+     */
+    protected $metaProperty = [];
 
     protected Cloud $assets;
 
@@ -76,7 +86,7 @@ class PageListener
      * @param Document $flarumDocument
      * @param ServerRequestInterface $serverRequestInterface
      */
-    public function __invoke(Document $flarumDocument, ServerRequestInterface $serverRequestInterface)
+    public function __invoke(Document $flarumDocument, ServerRequestInterface $serverRequestInterface): void
     {
         // Flarum document
         $this->flarumDocument = $flarumDocument;
@@ -93,7 +103,7 @@ class PageListener
     /**
      * Determine the current page type
      */
-    private function determine($serverRequest)
+    private function determine(ServerRequestInterface $serverRequest): void
     {
         // Request type
         $routeName = $serverRequest->getAttribute('routeName');
@@ -129,7 +139,7 @@ class PageListener
      * Default site meta tags
      * Available for all webpages
      */
-    private function setSiteTags()
+    private function setSiteTags(): void
     {
         $applicationName = $this->settings->get('forum_title');
         $applicationDescription = $this->settings->get('forum_description');
@@ -192,7 +202,7 @@ class PageListener
     /**
      * Finish process and output language, meta property tags, canonical urls & Schema.org json
      */
-    public function finish($serverRequest)
+    public function finish(ServerRequestInterface $serverRequest): void
     {
         // Add language attribute to html tag
         $this->flarumDocument->language = $serverRequest->getAttribute('locale');
@@ -214,7 +224,7 @@ class PageListener
     /**
      * Schema.org json
      */
-    private function writeSchemesOrgJson()
+    private function writeSchemesOrgJson(): string
     {
         $show = [];
         $show[] = $this->schemaArray;
@@ -258,9 +268,9 @@ class PageListener
     /**
      * Add the potential search bar
      *
-     * @return array
+     * @return array<string, mixed>
      */
-    private function addSearchBar()
+    private function addSearchBar(): array
     {
         return [
             '@context' => 'http://schema.org',
@@ -275,9 +285,9 @@ class PageListener
     }
 
     /**
-     * @param $key
-     * @param $value
-     * @return PageListener
+     * @param string $key
+     * @param mixed $value
+     * @return $this
      */
     public function setMetaPropertyTag($key, $value)
     {
@@ -287,9 +297,9 @@ class PageListener
     }
 
     /**
-     * @param $key
-     * @param $value
-     * @return PageListener
+     * @param string $key
+     * @param mixed $value
+     * @return $this
      */
     public function setMetaTag($key, $value)
     {
@@ -299,9 +309,9 @@ class PageListener
     }
 
     /**
-     * @param $key
-     * @param $value
-     * @return PageListener
+     * @param string $key
+     * @param mixed $value
+     * @return $this
      */
     public function setSchemaJson($key, $value)
     {
@@ -311,8 +321,9 @@ class PageListener
     }
 
     /**
-     * @param array $tagList
-     * @param string $listOrder https://schema.org/ItemListOrderType
+     * @param array<int, array<string, mixed>> $tagList
+     * @param string $listOrderType https://schema.org/ItemListOrderType
+     * @return void
      */
     public function setSchemaBreadcrumb($tagList = [], $listOrderType = 'ItemListUnordered')
     {
@@ -350,8 +361,9 @@ class PageListener
     /**
      * Current page URL
      *
-     * @param $path
-     * @return PageListener
+     * @param string $path
+     * @param bool $prependApplicationUrl
+     * @return $this
      */
     public function setUrl($path = '', $prependApplicationUrl = true)
     {
@@ -370,8 +382,9 @@ class PageListener
     /**
      * Set canonical url
      *
-     * @param $path
-     * @return PageListener
+     * @param string $path
+     * @param bool $prependApplicationUrl
+     * @return $this
      */
     public function setCanonicalUrl($path, $prependApplicationUrl = true)
     {
@@ -386,7 +399,7 @@ class PageListener
     }
 
     /**
-     * @param $path
+     * @param string $path
      * @return string
      */
     public function getApplicationPath($path)
@@ -397,9 +410,9 @@ class PageListener
     /**
      * Set title
      *
-     * @param $title
-     * @param $headline
-     * @return PageListener
+     * @param string|null $title
+     * @param bool $headline
+     * @return $this
      */
     public function setTitle($title, $headline = false)
     {
@@ -418,8 +431,8 @@ class PageListener
     /**
      * Set description
      *
-     * @param $content
-     * @return PageListener
+     * @param string|null $description
+     * @return $this
      */
     public function setDescription($description)
     {
@@ -435,11 +448,12 @@ class PageListener
     /**
      * Set page keywords
      *
-     * @param $keywords
+     * @param string|array<int, string>|null $keywords
+     * @return void
      */
     public function setKeywords($keywords)
     {
-        if (!$keywords || $keywords === "") return;
+        if (!$keywords) return;
 
         // Possible array of keywords
         if (is_array($keywords)) {
@@ -453,8 +467,8 @@ class PageListener
     /**
      * Get image from content
      *
-     * @param $content
-     * @return PageListener
+     * @param string|null $content
+     * @return string|null
      */
     public function getImageFromContent(?string $content = null): ?string
     {
@@ -465,7 +479,7 @@ class PageListener
     /**
      * Get estimated reading time
      */
-    public function getEstimatedReadingTime(string $content = null)
+    public function getEstimatedReadingTime(?string $content = null): int
     {
         // Delegated to the stateless SeoContentUtils (single source of truth).
         return (new SeoContentUtils())->getEstimatedReadingTime($content);
@@ -474,8 +488,8 @@ class PageListener
     /**
      * Set published on
      *
-     * @param $published
-     * @return PageListener
+     * @param \DateTimeInterface|string|null $published
+     * @return $this
      */
     public function setPublishedOn($published)
     {
@@ -492,8 +506,8 @@ class PageListener
      * Set updated time
      * Only used when a discussion has newer posts
      *
-     * @param $updated
-     * @return PageListener
+     * @param \DateTimeInterface|string|null $updated
+     * @return $this
      */
     public function setUpdatedOn($updated)
     {
@@ -509,8 +523,8 @@ class PageListener
     /**
      * Set page image
      *
-     * @param $imagePath
-     * @return PageListener
+     * @param string $imagePath
+     * @return $this
      */
     public function setImage($imagePath)
     {
@@ -592,7 +606,8 @@ class PageListener
     /**
      * Set page title
      *
-     * @param $title
+     * @param string|null $title
+     * @return $this
      */
     public function setPageTitle($title)
     {

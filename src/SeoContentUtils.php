@@ -38,11 +38,7 @@ class SeoContentUtils
         $pattern = '/(?<=src=")((http.*?\.)(jpe?g|png|[tg]iff?|svg|webp)(\?[a-zA-Z0-9\_\-\=\&]*)?)(?=")/';
 
         if (preg_match_all($pattern, $content, $matches) && count($matches) > 0) {
-            $contentImage = $matches[0][0];
-
-            if ($contentImage !== null) {
-                return $contentImage;
-            }
+            return $matches[0][0];
         }
 
         return null;

@@ -6,11 +6,13 @@ use Ernestdefoe\Seo\SeoMeta\SeoMeta;
 
 class Created
 {
-    // Basic meta info
+    /** @var string */
     public $objectType;
+
+    /** @var int */
     public $objectId;
 
-    // SeoMeta object
+    /** @var SeoMeta */
     public $seoMeta;
 
     public function __construct(SeoMeta $seoMeta)

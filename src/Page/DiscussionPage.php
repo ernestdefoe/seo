@@ -50,8 +50,12 @@ class DiscussionPage implements PageDriverInterface
     protected $slugManager;
 
     /**
+     * @var Dispatcher
+     */
+    protected $events;
+
+    /**
      * @param SettingsRepositoryInterface $settingsRepositoryInterface
-     * @param TranslatorInterface $translator
      */
     public function __construct(
         SettingsRepositoryInterface $settingsRepositoryInterface,
@@ -86,7 +90,7 @@ class DiscussionPage implements PageDriverInterface
     public function handle(
         ServerRequestInterface $request,
         SeoProperties $properties
-    ) {
+    ): void {
         // With "index all posts" on, DiscussionBestAnswerPage (active whenever
         // tags are) takes every discussion: Q&A ones it describes itself, the
         // rest it hands to describe() below.
@@ -132,7 +136,7 @@ class DiscussionPage implements PageDriverInterface
 
         $tagsEnabled = $this->extensionManager->isEnabled('flarum-tags');
 
-        /** @var Collection<Tag> $discussionTags */
+        /** @var Collection<int, Tag> $discussionTags */
         $discussionTags = $discussion->tags;
 
         // Get seo-meta-date
