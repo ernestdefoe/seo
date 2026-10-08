@@ -217,7 +217,8 @@ class DiscussionBestAnswerPage implements PageDriverInterface
             $acceptedPost = $discussion->posts()
                 ->whereVisibleTo($guest)
                 ->with('user')
-                ->withCount('likes')
+                // The likes relation exists only while flarum/likes is enabled.
+                ->when($enableLikes, fn ($query) => $query->withCount('likes'))
                 ->where('id', $bestAnswerId)
                 ->where('number', '>', '1')
                 ->first();
@@ -229,14 +230,14 @@ class DiscussionBestAnswerPage implements PageDriverInterface
 
         // Suggested answers — capped (see MAX_SUGGESTED_ANSWERS). Eager-load
         // `user` so the per-post author lookup isn't N+1; withCount('likes')
-        // exposes $post->likes_count as an aggregate so upvoteCount reads it
-        // without hydrating every Like row.
+        // (with flarum/likes) exposes $post->likes_count as an aggregate so
+        // upvoteCount reads it without hydrating every Like row.
         /** @var Collection<Post> $posts */
         $posts = $discussion->posts()
             ->whereVisibleTo($guest)
             ->where('type', 'comment')
             ->with('user')
-            ->withCount('likes')
+            ->when($enableLikes, fn ($query) => $query->withCount('likes'))
             ->where('number', '>', '1')
             ->when($bestAnswerId, fn ($query) => $query->where('id', '!=', $bestAnswerId))
             ->limit(self::MAX_SUGGESTED_ANSWERS)
