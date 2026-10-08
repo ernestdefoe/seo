@@ -226,19 +226,18 @@ class SeoMeta extends AbstractModel
         $objectType = $model->getTable();
         $objectId   = $model->getKey();
 
-        // Array-defaults path: firstOrCreate is atomic on the (type, id)
-        // unique index, so the race is already handled by the DB layer.
-        if (!is_callable($fillables)) {
-            return self::firstOrCreate([
-                'object_type' => $objectType,
-                'object_id'   => $objectId,
-            ], $fillables);
+        // Array defaults are filled onto the row build() starts, like the
+        // callable path. This used to be firstOrCreate(), which skipped
+        // build() and so never set created_at — NOT NULL, and Flarum models
+        // keep no timestamps of their own — so the first view of any page
+        // without a row yet (everything older than the extension) was a 500.
+        // selectOrInsert also handles the unique-index collision two
+        // concurrent first-time requests would otherwise 500 on.
+        if (! is_callable($fillables)) {
+            $defaults = $fillables;
+            $fillables = fn (self $meta) => $meta->fill($defaults);
         }
 
-        // Callable path: shares the SELECT-then-INSERT-with-race-guard logic
-        // with findByObjectTypeOrCreate (see selectOrInsert) — the firstOrCreate
-        // above can't take a closure, so this path handles the unique-index
-        // collision two concurrent first-time requests would otherwise 500 on.
         return self::selectOrInsert($objectType, $objectId, $fillables);
     }
 }
