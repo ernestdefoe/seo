@@ -87,6 +87,26 @@ class DiscussionPage implements PageDriverInterface
         ServerRequestInterface $request,
         SeoProperties $properties
     ) {
+        // With "index all posts" on, DiscussionBestAnswerPage (active whenever
+        // tags are) takes every discussion: Q&A ones it describes itself, the
+        // rest it hands to describe() below.
+        if (
+            $this->settingsRepositoryInterface->get('seo_post_crawler', 0) == 1 &&
+            $this->extensionManager->isEnabled('flarum-tags')
+        ) {
+            return;
+        }
+
+        $this->describe($request, $properties);
+    }
+
+    /**
+     * Describe the discussion as an ordinary forum posting.
+     */
+    public function describe(
+        ServerRequestInterface $request,
+        SeoProperties $properties
+    ): void {
         // Get discussion ID from params
         $discussionId = Arr::get($request->getQueryParams(), 'id');
 
@@ -111,18 +131,9 @@ class DiscussionPage implements PageDriverInterface
         }
 
         $tagsEnabled = $this->extensionManager->isEnabled('flarum-tags');
-        $enableBestAnswer = $this->extensionManager->isEnabled('fof-best-answer');
 
         /** @var Collection<Tag> $discussionTags */
         $discussionTags = $discussion->tags;
-
-        // Do not continue discussion matches a FriendsOfFlarum BestAnswer discussion (if enabled)
-        if (
-            $this->settingsRepositoryInterface->get('seo_post_crawler', 0) == 1 &&
-            $tagsEnabled && (!$enableBestAnswer || ($enableBestAnswer && $discussionTags->contains(fn(Tag $tag) => (bool)$tag->is_qna )))
-        ) {
-            return;
-        }
 
         // Get seo-meta-date
         $seoMeta = SeoMeta::findByModelOrCreate(
