@@ -3,7 +3,7 @@
 namespace Ernestdefoe\Seo\Page;
 
 use Flarum\Database\Eloquent\Collection;
-use Flarum\Discussion\DiscussionRepository;
+use Flarum\Discussion\Discussion;
 use Flarum\Extension\ExtensionManager;
 use Flarum\Foundation\DispatchEventsTrait;
 use Flarum\Http\RequestUtil;
@@ -30,11 +30,6 @@ class DiscussionPage implements PageDriverInterface
     protected $settingsRepositoryInterface;
 
     /**
-     * @var DiscussionRepository
-     */
-    protected $discussionRepository;
-
-    /**
      * @var UserRepository
      */
     protected $userRepository;
@@ -56,12 +51,10 @@ class DiscussionPage implements PageDriverInterface
 
     /**
      * @param SettingsRepositoryInterface $settingsRepositoryInterface
-     * @param DiscussionRepository $discussionRepository
      * @param TranslatorInterface $translator
      */
     public function __construct(
         SettingsRepositoryInterface $settingsRepositoryInterface,
-        DiscussionRepository $discussionRepository,
         UserRepository $userRepository,
         ExtensionManager $extensionManager,
         UrlGenerator $urlGenerator,
@@ -69,7 +62,6 @@ class DiscussionPage implements PageDriverInterface
         SlugManager $slugManager
     ) {
         $this->settingsRepositoryInterface = $settingsRepositoryInterface;
-        $this->discussionRepository = $discussionRepository;
         $this->userRepository = $userRepository;
         $this->extensionManager = $extensionManager;
         $this->urlGenerator = $urlGenerator;
@@ -98,13 +90,23 @@ class DiscussionPage implements PageDriverInterface
         // Get discussion ID from params
         $discussionId = Arr::get($request->getQueryParams(), 'id');
 
+        if (! is_string($discussionId)) {
+            return;
+        }
+
         try {
             // Find discussion — scoped to the requesting actor's visibility so a
             // hidden / tag-restricted / soft-deleted discussion never leaks its
             // title or description into the server-rendered meta tags.
-            $discussion = $this->discussionRepository->findOrFail($discussionId, RequestUtil::getActor($request));
+            // Through the slug driver, as core resolves the page: the id
+            // parameter is "42-a-title", which only MySQL would cast to 42.
+            $discussion = $this->slugManager->forResource(Discussion::class)->fromSlug($discussionId, RequestUtil::getActor($request));
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             // Do nothing, no model found
+            return;
+        }
+
+        if (! $discussion instanceof Discussion) {
             return;
         }
 

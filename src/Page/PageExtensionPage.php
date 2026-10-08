@@ -67,7 +67,8 @@ class PageExtensionPage implements PageDriverInterface
         $pageId = Arr::get($request->getQueryParams(), 'id');
 
         try {
-            $page = $this->container->make(PageRepository::class)->findOrFail($pageId, RequestUtil::getActor($request));
+            // The id parameter is "1-house-rules"; fof/pages reads it as (int) too.
+            $page = $this->container->make(PageRepository::class)->findOrFail((int) $pageId, RequestUtil::getActor($request));
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             // Do nothing, no model found
             return;
