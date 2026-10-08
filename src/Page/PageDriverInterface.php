@@ -2,25 +2,25 @@
 
 namespace Ernestdefoe\Seo\Page;
 
-use Psr\Http\Message\ServerRequestInterface;
 use Ernestdefoe\Seo\SeoProperties;
+use Psr\Http\Message\ServerRequestInterface;
 
 interface PageDriverInterface
 {
     /**
-     * A list of Flarum extension IDs for extensions that should be enabled
+     * A list of Flarum extension IDs for extensions that should be enabled.
      */
     public function extensionDependencies(): array;
 
     /**
-     * A list of route names that will be handled
+     * A list of route names that will be handled.
      *
      * Empty array if handles for all routes
      */
     public function handleRoutes(): array;
 
     /**
-     * Handle page SEO
+     * Handle page SEO.
      *
      * @return void
      */

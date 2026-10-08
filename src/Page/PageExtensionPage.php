@@ -2,14 +2,14 @@
 
 namespace Ernestdefoe\Seo\Page;
 
+use Ernestdefoe\Seo\SeoMeta\SeoMeta;
+use Ernestdefoe\Seo\SeoProperties;
+use Flarum\Http\RequestUtil;
 use FoF\Pages\PageRepository;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Arr;
-use Flarum\Http\RequestUtil;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Ernestdefoe\Seo\SeoMeta\SeoMeta;
-use Ernestdefoe\Seo\SeoProperties;
 
 class PageExtensionPage implements PageDriverInterface
 {
@@ -44,7 +44,7 @@ class PageExtensionPage implements PageDriverInterface
         Container $container
     ) {
         $this->translator = $translator;
-        $this->container  = $container;
+        $this->container = $container;
     }
 
     public function extensionDependencies(): array
@@ -107,10 +107,10 @@ class PageExtensionPage implements PageDriverInterface
             ->setSchemaJson('text', $plainText)
 
             // Tag URL
-            ->setUrl('/p/' . $page->getAttribute('id') . '-' . $page->getAttribute('slug'))
+            ->setUrl('/p/'.$page->getAttribute('id').'-'.$page->getAttribute('slug'))
 
             // Canonical url
-            ->setCanonicalUrl('/p/' . $page->getAttribute('id'))
+            ->setCanonicalUrl('/p/'.$page->getAttribute('id'))
 
             ->generateTagsFromMetaData($seoMeta);
     }

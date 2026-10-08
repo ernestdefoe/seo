@@ -6,7 +6,7 @@ use Ernestdefoe\Seo\Listeners\PageListener;
 use Ernestdefoe\Seo\SeoMeta\SeoMeta;
 
 /**
- * FlarumSeo Properties Extender
+ * FlarumSeo Properties Extender.
  */
 class SeoProperties
 {
@@ -30,15 +30,17 @@ class SeoProperties
     }
 
     /**
-     * Page title
+     * Page title.
      *
      * @param string $title Sets title
-     * @param boolean $updatePageTitle Update page title as well
+     * @param bool $updatePageTitle Update page title as well
      * @param bool $useAsHeadLine Only true if you want to use this as headline
      */
     public function setTitle(string $title, $updatePageTitle = true, bool $useAsHeadLine = false): self
     {
-        if ($this->container === null) self::throwError("setTitle");
+        if ($this->container === null) {
+            self::throwError('setTitle');
+        }
 
         $this->container->setTitle($title, $useAsHeadLine);
 
@@ -51,17 +53,21 @@ class SeoProperties
     }
 
     /**
-     * Page description
+     * Page description.
      *
      * @param string $content The description will automatically be 'dotted' if too long
      */
-    public function setDescription(string|null $content = null): self
+    public function setDescription(?string $content = null): self
     {
         // Empty description
-        if ($content === null) return $this;
+        if ($content === null) {
+            return $this;
+        }
 
         // Container not initialized
-        if ($this->container === null) self::throwError("setDescription");
+        if ($this->container === null) {
+            self::throwError('setDescription');
+        }
 
         // Set description
         $this->container->setDescription($content);
@@ -70,7 +76,7 @@ class SeoProperties
     }
 
     /**
-     * Generate page description
+     * Generate page description.
      */
     /** @param string|null $content */
     public function generateDescriptionFromContent($content): string
@@ -79,14 +85,16 @@ class SeoProperties
     }
 
     /**
-     * Page full URL
+     * Page full URL.
      *
      * @param string $url The path or url of the page (if it is the full url, set $addApplicationUrl to false)
      * @param bool $prependApplicationUrl Adds application before the URL if true
      */
     public function setUrl(string $url, bool $prependApplicationUrl = true): self
     {
-        if ($this->container === null) self::throwError("setUrl");
+        if ($this->container === null) {
+            self::throwError('setUrl');
+        }
 
         $this->container->setUrl($url, $prependApplicationUrl);
 
@@ -94,7 +102,7 @@ class SeoProperties
     }
 
     /**
-     * Page canonical URL
+     * Page canonical URL.
      *
      * @param string $path The path after the application URL
      *
@@ -102,7 +110,9 @@ class SeoProperties
      */
     public function setCanonicalUrl(string $path, bool $prependApplicationUrl = true): self
     {
-        if ($this->container === null) self::throwError("setCanonicalUrl");
+        if ($this->container === null) {
+            self::throwError('setCanonicalUrl');
+        }
 
         $this->container->setCanonicalUrl($path, $prependApplicationUrl);
 
@@ -110,7 +120,7 @@ class SeoProperties
     }
 
     /**
-     * Page keywords
+     * Page keywords.
      *
      * @param array $keywords An array of keywords that describes the page
      *
@@ -118,7 +128,9 @@ class SeoProperties
      */
     public function setKeywords(array|string $keywords): self
     {
-        if ($this->container === null) self::throwError("setKeywords");
+        if ($this->container === null) {
+            self::throwError('setKeywords');
+        }
 
         $this->container->setKeywords($keywords);
 
@@ -126,13 +138,15 @@ class SeoProperties
     }
 
     /**
-     * Social media image
+     * Social media image.
      *
      * @param string|null $imageUrl Path to an image
      */
     public function setImage(?string $imageUrl): self
     {
-        if ($this->container === null) self::throwError("setImage");
+        if ($this->container === null) {
+            self::throwError('setImage');
+        }
 
         if ($imageUrl) {
             $this->container->setImage($imageUrl);
@@ -142,7 +156,7 @@ class SeoProperties
     }
 
     /**
-     * Page published on
+     * Page published on.
      *
      * @param string $datetime The full date time
      *
@@ -150,7 +164,9 @@ class SeoProperties
      */
     public function setPublishedOn(string $datetime): self
     {
-        if ($this->container === null) self::throwError("setPublishedOn");
+        if ($this->container === null) {
+            self::throwError('setPublishedOn');
+        }
 
         $this->container->setPublishedOn($datetime);
 
@@ -158,7 +174,7 @@ class SeoProperties
     }
 
     /**
-     * Page last updated on
+     * Page last updated on.
      *
      * @param string $datetime The full date time
      *
@@ -166,7 +182,9 @@ class SeoProperties
      */
     public function setUpdatedOn(string $datetime): self
     {
-        if ($this->container === null) self::throwError("setUpdatedOn");
+        if ($this->container === null) {
+            self::throwError('setUpdatedOn');
+        }
 
         $this->container->setUpdatedOn($datetime);
 
@@ -174,7 +192,7 @@ class SeoProperties
     }
 
     /**
-     * Adds or updates an 'og:' key
+     * Adds or updates an 'og:' key.
      *
      * @param string $key
      * @param string|array $value
@@ -185,7 +203,9 @@ class SeoProperties
      */
     public function setMetaPropertyTag(string $key, $value): self
     {
-        if ($this->container === null) self::throwError("setMetaPropertyTag");
+        if ($this->container === null) {
+            self::throwError('setMetaPropertyTag');
+        }
 
         $this->container->setMetaPropertyTag($key, $value);
 
@@ -193,7 +213,7 @@ class SeoProperties
     }
 
     /**
-     * Adds or updates a meta tag
+     * Adds or updates a meta tag.
      *
      * @param string $key
      * @param string|array $value
@@ -204,7 +224,9 @@ class SeoProperties
      */
     public function setMetaTag(string $key, $value): self
     {
-        if ($this->container === null) self::throwError("setMetaTag");
+        if ($this->container === null) {
+            self::throwError('setMetaTag');
+        }
 
         $this->container->setMetaTag($key, $value);
 
@@ -212,7 +234,7 @@ class SeoProperties
     }
 
     /**
-     * Adds or updates a JSON schema key
+     * Adds or updates a JSON schema key.
      *
      * @param string $key
      * @param string|array $value
@@ -223,7 +245,9 @@ class SeoProperties
      */
     public function setSchemaJson(string $key, $value): self
     {
-        if ($this->container === null) self::throwError("setSchemaJson");
+        if ($this->container === null) {
+            self::throwError('setSchemaJson');
+        }
 
         $this->container->setSchemaJson($key, $value);
 
@@ -231,13 +255,15 @@ class SeoProperties
     }
 
     /**
-     * Returns current application full-path
+     * Returns current application full-path.
      *
      * @param string $path
      */
     public function withApplicationPath(string $path): string
     {
-        if ($this->container === null) self::throwError("withApplicationPath");
+        if ($this->container === null) {
+            self::throwError('withApplicationPath');
+        }
 
         return $this->container->getApplicationPath($path);
     }
@@ -253,12 +279,14 @@ class SeoProperties
     }
 
     /**
-     * Generates a
+     * Generates a.
      */
     /** @param array<int, array<string, mixed>> $tags */
     public function generateSchemaBreadcrumb(array $tags): self
     {
-        if ($this->container === null) self::throwError("generateSchemaBreadcrumb");
+        if ($this->container === null) {
+            self::throwError('generateSchemaBreadcrumb');
+        }
 
         $this->container->setSchemaBreadcrumb($tags);
 
@@ -266,11 +294,13 @@ class SeoProperties
     }
 
     /**
-     * Generate default tags from meta
+     * Generate default tags from meta.
      */
     public function generateTagsFromMetaData(SeoMeta $data): self
     {
-        if ($this->container === null) self::throwError("generateTagsFromMetaData");
+        if ($this->container === null) {
+            self::throwError('generateTagsFromMetaData');
+        }
 
         $this->container->generateTagsFromMetaData($data);
 
@@ -278,10 +308,10 @@ class SeoProperties
     }
 
     /**
-     * Container was not yet initialized
+     * Container was not yet initialized.
      */
     private static function throwError(string $caller): never
     {
-        throw new \Exception("SeoProperties::" . $caller . "(..): You're doing it wrong, container was improperly initialized. Please review Flarum SEO documentation.");
+        throw new \Exception('SeoProperties::'.$caller."(..): You're doing it wrong, container was improperly initialized. Please review Flarum SEO documentation.");
     }
 }

@@ -2,14 +2,13 @@
 
 namespace Ernestdefoe\Seo\Api\Resource;
 
-use Flarum\Api\Context;
+use Ernestdefoe\Seo\SeoMeta\SeoMeta;
 use Flarum\Api\Endpoint;
 use Flarum\Api\Resource\AbstractDatabaseResource;
 use Flarum\Api\Schema;
 use Flarum\Http\RequestUtil;
 use Illuminate\Database\Eloquent\Builder;
 use Tobyz\JsonApiServer\Context as BaseContext;
-use Ernestdefoe\Seo\SeoMeta\SeoMeta;
 
 /**
  * Flarum 2 JSON:API Resource replacing the v1 ListSeoMetaController +
@@ -73,7 +72,7 @@ class SeoMetaResource extends AbstractDatabaseResource
             $actor->assertCan('seo.canConfigure');
 
             $objectType = $m[1];
-            $objectId   = (int) $m[2];
+            $objectId = (int) $m[2];
 
             if (! in_array($objectType, self::ALLOWED_OBJECT_TYPES, true)) {
                 return null;

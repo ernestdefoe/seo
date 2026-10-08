@@ -2,12 +2,12 @@
 
 namespace Ernestdefoe\Seo\Page;
 
+use Ernestdefoe\Seo\SeoProperties;
 use Flarum\Http\RequestUtil;
 use Flarum\User\UserRepository;
 use Illuminate\Support\Arr;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Ernestdefoe\Seo\SeoProperties;
 
 class ProfilePage implements PageDriverInterface
 {
@@ -62,19 +62,21 @@ class ProfilePage implements PageDriverInterface
                 : $this->userRepository->findOrFailByUsername($username, $actor);
 
             // Make sure there's a user
-            if ($user === null) return;
+            if ($user === null) {
+                return;
+            }
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             // Do nothing. It just did not work
             return;
         }
 
         // Profile title
-        $profileTitle = $this->translator->trans("ernestdefoe-seo.forum.profile_title", [
+        $profileTitle = $this->translator->trans('ernestdefoe-seo.forum.profile_title', [
             'username' => $user->getAttribute('display_name'),
         ]);
 
         // Profile description
-        $profileDescription = $this->translator->trans("ernestdefoe-seo.forum.profile_description", [
+        $profileDescription = $this->translator->trans('ernestdefoe-seo.forum.profile_description', [
             'username' => $user->getAttribute('display_name'),
             'discussion_count' => $user->getAttribute('discussion_count'),
             'comment_count' => $user->getAttribute('comment_count')
@@ -82,7 +84,7 @@ class ProfilePage implements PageDriverInterface
 
         // Schema
         $mainEntity = [
-            "@type" => "Person",
+            '@type' => 'Person',
             'name' => $user->getAttribute('username')
         ];
 
@@ -117,9 +119,9 @@ class ProfilePage implements PageDriverInterface
             ->setDescription($profileDescription)
 
             // Profile URL
-            ->setUrl('/u/' . $user->getAttribute('username'))
+            ->setUrl('/u/'.$user->getAttribute('username'))
 
             // Canonical url
-            ->setCanonicalUrl('/u/' . $user->getAttribute('username'));
+            ->setCanonicalUrl('/u/'.$user->getAttribute('username'));
     }
 }

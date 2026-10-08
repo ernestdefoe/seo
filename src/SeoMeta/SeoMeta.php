@@ -3,11 +3,11 @@
 namespace Ernestdefoe\Seo\SeoMeta;
 
 use Carbon\Carbon;
+use Ernestdefoe\Seo\SeoMeta\Event\Created;
 use Flarum\Database\AbstractModel;
 use Flarum\Foundation\EventGeneratorTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
-use Ernestdefoe\Seo\SeoMeta\Event\Created;
 
 /**
  * @property int $id
@@ -70,11 +70,11 @@ class SeoMeta extends AbstractModel
      * call downstream throws "method on string".
      */
     protected $casts = [
-        'created_at'       => 'datetime',
-        'updated_at'       => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
         'auto_update_data' => 'boolean',
-        'robots_noindex'   => 'boolean',
-        'robots_nofollow'  => 'boolean',
+        'robots_noindex' => 'boolean',
+        'robots_nofollow' => 'boolean',
         'robots_noarchive' => 'boolean',
         'robots_noimageindex' => 'boolean',
         'robots_nosnippet' => 'boolean',
@@ -105,9 +105,8 @@ class SeoMeta extends AbstractModel
         });
     }
 
-
     /**
-     * Find the SEO meta by object type
+     * Find the SEO meta by object type.
      *
      * @param string $objectType Name of the object
      * @param int $objectId ID of the object
@@ -121,12 +120,12 @@ class SeoMeta extends AbstractModel
     }
 
     /**
-     * Find the SEO meta by object type
-     * 
+     * Find the SEO meta by object type.
+     *
      * @param string $objectType Name of the object
      * @param int $objectId ID of the object
      */
-    public static function findByObjectTypeOrCreate(string $objectType, int $objectId, callable|null $fillables = null): self
+    public static function findByObjectTypeOrCreate(string $objectType, int $objectId, ?callable $fillables = null): self
     {
         return self::selectOrInsert($objectType, $objectId, $fillables);
     }
@@ -143,7 +142,7 @@ class SeoMeta extends AbstractModel
      * DB error surface. The "Created" event fires only for the request that
      * actually inserted, which is the desired semantics.
      */
-    private static function selectOrInsert(string $objectType, int $objectId, callable|null $fillables): self
+    private static function selectOrInsert(string $objectType, int $objectId, ?callable $fillables): self
     {
         $existing = self::where([
             ['object_type', '=', $objectType],
@@ -162,6 +161,7 @@ class SeoMeta extends AbstractModel
 
         try {
             $data->save();
+
             return $data;
         } catch (QueryException $e) {
             if ((string) $e->getCode() !== '23000') {
@@ -174,27 +174,27 @@ class SeoMeta extends AbstractModel
             if ($winner !== null) {
                 return $winner;
             }
+
             throw $e;
         }
     }
 
     /**
-     * Find by slug
-     * 
+     * Find by slug.
+     *
      * Could be used to add dynamic tags to pages that do not have a database row
      * For example: a blog home/overview page, knowledge base page, tags overview page etc.
-     * 
+     *
      * @param string $pageSlug Slug of the page
      */
-    public static function findOrCreateBySlug(string $pageSlug, callable|null $fillables = null): self
+    public static function findOrCreateBySlug(string $pageSlug, ?callable $fillables = null): self
     {
-        return self::findByObjectTypeOrCreate(str_replace("-", "_", $pageSlug), -1, $fillables);
+        return self::findByObjectTypeOrCreate(str_replace('-', '_', $pageSlug), -1, $fillables);
     }
 
-
     /**
-     * Find the SEO meta of an object from a model
-     * 
+     * Find the SEO meta of an object from a model.
+     *
      * @param Model $model The model
      */
     public static function findOneByModel(Model $model): ?self
@@ -206,8 +206,8 @@ class SeoMeta extends AbstractModel
     }
 
     /**
-     * Find the SEO meta of an object from a model
-     * 
+     * Find the SEO meta of an object from a model.
+     *
      * @param Model $model The model
      */
     public static function buildByModel(Model $model): self
@@ -216,15 +216,15 @@ class SeoMeta extends AbstractModel
     }
 
     /**
-     * Find or create the SEO meta of an object from a model
-     * 
+     * Find or create the SEO meta of an object from a model.
+     *
      * @param Model $model The model
      */
     /** @param array<string, mixed>|callable $fillables */
     public static function findByModelOrCreate(Model $model, array|callable $fillables = []): self
     {
         $objectType = $model->getTable();
-        $objectId   = $model->getKey();
+        $objectId = $model->getKey();
 
         // Array defaults are filled onto the row build() starts, like the
         // callable path. This used to be firstOrCreate(), which skipped

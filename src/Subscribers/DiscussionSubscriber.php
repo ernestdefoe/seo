@@ -2,26 +2,28 @@
 
 namespace Ernestdefoe\Seo\Subscribers;
 
+use Ernestdefoe\Seo\SeoContentUtils;
+use Ernestdefoe\Seo\SeoMeta\Event\Created;
+use Ernestdefoe\Seo\SeoMeta\SeoMeta;
 use Flarum\Discussion\Discussion;
 use Flarum\Discussion\Event as DiscussionEvent;
 use Flarum\Post\CommentPost;
-use Ernestdefoe\Seo\SeoContentUtils;
-use Ernestdefoe\Seo\SeoMeta\SeoMeta;
 use Illuminate\Contracts\Events\Dispatcher;
-use Ernestdefoe\Seo\SeoMeta\Event\Created;
 
 /**
- * Subscribe to discussion creation, update or deleted
+ * Subscribe to discussion creation, update or deleted.
  */
 class DiscussionSubscriber
 {
     // Inject the stateless SeoContentUtils instead of SeoProperties, so this
     // hot-path subscriber doesn't construct a PageListener on every event.
-    public function __construct(private SeoContentUtils $contentUtils) {}
+    public function __construct(private SeoContentUtils $contentUtils)
+    {
+    }
 
     /**
-     * Subscribe to events
-     * 
+     * Subscribe to events.
+     *
      * @param Dispatcher $events
      */
     public function subscribe($events): void
@@ -33,7 +35,7 @@ class DiscussionSubscriber
     }
 
     /**
-     * Handle model event
+     * Handle model event.
      *
      * @param DiscussionEvent\Deleting|DiscussionEvent\Started|DiscussionEvent\Renamed $event
      */
@@ -53,12 +55,12 @@ class DiscussionSubscriber
         }
 
         // Create new meta by model
-        if (!$meta) {
+        if (! $meta) {
             $meta = SeoMeta::buildByModel($event->discussion);
         }
 
         // Do not auto update
-        if (!$meta->auto_update_data) {
+        if (! $meta->auto_update_data) {
             return;
         }
 
@@ -69,14 +71,16 @@ class DiscussionSubscriber
     }
 
     /**
-     * Handle meta created event
-     * 
+     * Handle meta created event.
+     *
      * @param Created $event
      */
     public function onMetaCreated(Created $event): void
     {
         // Only update meta data if object type matches
-        if ($event->objectType !== 'discussions') return;
+        if ($event->objectType !== 'discussions') {
+            return;
+        }
 
         // Find discussion. May be null if the discussion was deleted
         // between the SeoMeta creation event and this listener firing
@@ -85,7 +89,9 @@ class DiscussionSubscriber
         // ->created_at, ->firstPost etc., which would TypeError on
         // null and bubble up as a 500 — silently bail out instead.
         $discussion = Discussion::find($event->objectId);
-        if ($discussion === null) return;
+        if ($discussion === null) {
+            return;
+        }
 
         $this->updateMeta($event->seoMeta, $discussion);
 
@@ -93,7 +99,7 @@ class DiscussionSubscriber
     }
 
     /**
-     * Public function to update 
+     * Public function to update.
      */
     public function updateMeta(SeoMeta $meta, Discussion $discussion): void
     {
@@ -103,7 +109,7 @@ class DiscussionSubscriber
 
         $firstPost = $discussion->firstPost;
 
-        // If a discussion has a first post, use edited_at time if intial post was more recent edited than the last post was posted 
+        // If a discussion has a first post, use edited_at time if intial post was more recent edited than the last post was posted
         if ($firstPost) {
             $meta->updated_at = $firstPost->edited_at > $discussion->last_posted_at ? $firstPost->edited_at : $discussion->last_posted_at;
         } else {
@@ -126,7 +132,7 @@ class DiscussionSubscriber
             }
 
             // Only update image if source was set to auto and is not managed by a different extension
-            if (!$meta->open_graph_image_source || $meta->open_graph_image_source === 'auto') {
+            if (! $meta->open_graph_image_source || $meta->open_graph_image_source === 'auto') {
                 // Set page image
                 if ($image = $this->contentUtils->getImageFromContent($content)) {
                     $meta->open_graph_image = $image;

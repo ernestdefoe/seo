@@ -2,6 +2,17 @@
 
 namespace Ernestdefoe\Seo;
 
+use Ernestdefoe\Seo\Api\Controllers\DeleteSocialMediaImageController;
+use Ernestdefoe\Seo\Api\Controllers\UploadSocialMediaImageController;
+use Ernestdefoe\Seo\Api\Resource\SeoMetaResource;
+use Ernestdefoe\Seo\Content\SearchEngineVerification;
+use Ernestdefoe\Seo\Controller\Robots;
+use Ernestdefoe\Seo\Extend\SEO;
+use Ernestdefoe\Seo\Formatter\FormatLinks;
+use Ernestdefoe\Seo\Listeners\PageListener;
+use Ernestdefoe\Seo\Page as SeoPage;
+use Ernestdefoe\Seo\SeoMeta\SeoMeta;
+use Ernestdefoe\Seo\Sitemap\SitemapController;
 use Flarum\Api\Endpoint;
 use Flarum\Api\Resource\DiscussionResource;
 use Flarum\Api\Resource\ForumResource;
@@ -9,17 +20,6 @@ use Flarum\Api\Schema;
 use Flarum\Database\AbstractModel;
 use Flarum\Discussion\Discussion as FlarumDiscussion;
 use Flarum\Extend;
-use Ernestdefoe\Seo\Api\Controllers\DeleteSocialMediaImageController;
-use Ernestdefoe\Seo\Api\Controllers\UploadSocialMediaImageController;
-use Ernestdefoe\Seo\Api\Resource\SeoMetaResource;
-use Ernestdefoe\Seo\Content\SearchEngineVerification;
-use Ernestdefoe\Seo\Controller\Robots;
-use Ernestdefoe\Seo\Sitemap\SitemapController;
-use Ernestdefoe\Seo\Formatter\FormatLinks;
-use Ernestdefoe\Seo\Extend\SEO;
-use Ernestdefoe\Seo\Listeners\PageListener;
-use Ernestdefoe\Seo\Page as SeoPage;
-use Ernestdefoe\Seo\SeoMeta\SeoMeta;
 
 /**
  * Flarum 2 wiring for ernestdefoe/seo.
@@ -41,7 +41,6 @@ use Ernestdefoe\Seo\SeoMeta\SeoMeta;
  * the per-route Page drivers in src/Page, the event subscribers, and the
  * SeoMeta companion table) was already v2-compatible and is unchanged.
  */
-
 $events = (new Extend\Event())
     ->subscribe(Subscribers\DiscussionSubscriber::class)
     ->subscribe(Subscribers\PostSubscriber::class);
@@ -88,16 +87,16 @@ return [
     (new Extend\Frontend('forum'))
         ->content(PageListener::class)
         ->content(SearchEngineVerification::class)
-        ->js(__DIR__ . '/js/dist/forum.js')
+        ->js(__DIR__.'/js/dist/forum.js')
         // The SEO modal is its own chunk, loaded when a moderator opens it.
-        ->jsDirectory(__DIR__ . '/js/dist/forum')
-        ->css(__DIR__ . '/less/Forum.less'),
+        ->jsDirectory(__DIR__.'/js/dist/forum')
+        ->css(__DIR__.'/less/Forum.less'),
 
     (new Extend\Frontend('admin'))
-        ->js(__DIR__ . '/js/dist/admin.js')
-        ->css(__DIR__ . '/less/Admin.less'),
+        ->js(__DIR__.'/js/dist/admin.js')
+        ->css(__DIR__.'/less/Admin.less'),
 
-    new Extend\Locales(__DIR__ . '/locale'),
+    new Extend\Locales(__DIR__.'/locale'),
 
     $routes,
 
@@ -188,8 +187,7 @@ return [
 
             return [
                 Schema\Boolean::make('canConfigureSeo')
-                    ->get(fn ($model, $context) =>
-                        $context->getActor()->hasPermissionLike('seo.canConfigure')),
+                    ->get(fn ($model, $context) => $context->getActor()->hasPermissionLike('seo.canConfigure')),
 
                 // The configured social-media image, on the forum payload (admin
                 // only) so the admin UI can read it via

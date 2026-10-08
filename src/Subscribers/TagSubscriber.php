@@ -2,16 +2,16 @@
 
 namespace Ernestdefoe\Seo\Subscribers;
 
-use Flarum\Tags\Event as TagEvent;
-use Flarum\Tags\Tag;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use Ernestdefoe\Seo\SeoContentUtils;
 use Ernestdefoe\Seo\SeoMeta\Event\Created;
 use Ernestdefoe\Seo\SeoMeta\SeoMeta;
+use Flarum\Tags\Event as TagEvent;
+use Flarum\Tags\Tag;
 use Illuminate\Contracts\Events\Dispatcher;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Subscribe to tags creation, update or deleted
+ * Subscribe to tags creation, update or deleted.
  */
 class TagSubscriber
 {
@@ -20,11 +20,12 @@ class TagSubscriber
     public function __construct(
         private SeoContentUtils $contentUtils,
         private TranslatorInterface $translator,
-    ) {}
+    ) {
+    }
 
     /**
-     * Subscribe function
-     * 
+     * Subscribe function.
+     *
      * @param Dispatcher $events
      */
     public function subscribe($events): void
@@ -35,7 +36,7 @@ class TagSubscriber
     }
 
     /**
-     * Handle model event
+     * Handle model event.
      *
      * @param TagEvent\Deleting|TagEvent\Saving $event
      */
@@ -55,12 +56,12 @@ class TagSubscriber
         }
 
         // Create new meta by model
-        if (!$meta) {
+        if (! $meta) {
             $meta = SeoMeta::buildByModel($event->tag);
         }
 
         // Do not auto update
-        if (!$meta->auto_update_data) {
+        if (! $meta->auto_update_data) {
             return;
         }
 
@@ -71,14 +72,16 @@ class TagSubscriber
     }
 
     /**
-     * Handle meta created event
-     * 
+     * Handle meta created event.
+     *
      * @param Created $event
      */
     public function onMetaCreated(Created $event): void
     {
         // Only update meta data if object type matches
-        if ($event->objectType !== 'tags') return;
+        if ($event->objectType !== 'tags') {
+            return;
+        }
 
         // Find tag. May be null if the tag was deleted between the
         // SeoMeta creation event and this listener firing — same
@@ -87,7 +90,9 @@ class TagSubscriber
         // ->last_posted_at, ->description on this value, which
         // would TypeError on null and bubble up as a 500.
         $tag = Tag::find($event->objectId);
-        if ($tag === null) return;
+        if ($tag === null) {
+            return;
+        }
 
         $this->updateMeta($event->seoMeta, $tag);
 
@@ -95,7 +100,7 @@ class TagSubscriber
     }
 
     /**
-     * Public function to update 
+     * Public function to update.
      */
     public function updateMeta(SeoMeta $meta, Tag $tag): void
     {

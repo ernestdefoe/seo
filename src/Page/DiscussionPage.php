@@ -2,13 +2,15 @@
 
 namespace Ernestdefoe\Seo\Page;
 
+use Ernestdefoe\Seo\SeoMeta\SeoMeta;
+use Ernestdefoe\Seo\SeoProperties;
 use Flarum\Database\Eloquent\Collection;
 use Flarum\Discussion\Discussion;
 use Flarum\Extension\ExtensionManager;
 use Flarum\Foundation\DispatchEventsTrait;
 use Flarum\Http\RequestUtil;
-use Flarum\Http\UrlGenerator;
 use Flarum\Http\SlugManager;
+use Flarum\Http\UrlGenerator;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\Tags\Tag;
 use Flarum\User\User;
@@ -16,9 +18,6 @@ use Flarum\User\UserRepository;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
 use Psr\Http\Message\ServerRequestInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
-use Ernestdefoe\Seo\SeoMeta\SeoMeta;
-use Ernestdefoe\Seo\SeoProperties;
 
 class DiscussionPage implements PageDriverInterface
 {
@@ -149,7 +148,7 @@ class DiscussionPage implements PageDriverInterface
 
         // Update ld-json
         $properties
-            ->setSchemaJson('@type', "DiscussionForumPosting")
+            ->setSchemaJson('@type', 'DiscussionForumPosting')
 
             // Set page type article
             ->setMetaPropertyTag('og:type', 'article');
@@ -158,7 +157,7 @@ class DiscussionPage implements PageDriverInterface
         $properties->generateTagsFromMetaData($seoMeta);
 
         // Update topic url
-        $properties->setUrl($this->urlGenerator->to('forum')->route('discussion', ['id' => $discussion->id . '-' . $discussion->slug]), false);
+        $properties->setUrl($this->urlGenerator->to('forum')->route('discussion', ['id' => $discussion->id.'-'.$discussion->slug]), false);
 
         try {
             // Add author to the page meta data
@@ -168,9 +167,9 @@ class DiscussionPage implements PageDriverInterface
             if ($user !== null) {
                 // author: https://schema.org/author typeof: https://schema.org/Person
                 $properties->setSchemaJson('author', [
-                    "@type" => "Person",
-                    "name" => $user->getDisplayNameAttribute(),
-                    "url" => $this->urlGenerator->to('forum')->route('user', ['username' => $this->slugManager->forResource(User::class)->toSlug($user)]),
+                    '@type' => 'Person',
+                    'name' => $user->getDisplayNameAttribute(),
+                    'url' => $this->urlGenerator->to('forum')->route('user', ['username' => $this->slugManager->forResource(User::class)->toSlug($user)]),
                 ]);
             }
         } catch (\Exception $e) {
@@ -180,7 +179,7 @@ class DiscussionPage implements PageDriverInterface
         // Generate a breadcrum if discussion has tags
         if ($tagsEnabled && $discussionTags->count() >= 1) {
             $properties->generateSchemaBreadcrumb(
-                $discussionTags->map(fn(Tag $tag) => [
+                $discussionTags->map(fn (Tag $tag) => [
                     'name' => $tag->name,
                     'url' => $this->urlGenerator->to('forum')->route('tag', ['slug' => $tag->slug])
                 ])->toArray()

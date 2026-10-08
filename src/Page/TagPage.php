@@ -2,6 +2,8 @@
 
 namespace Ernestdefoe\Seo\Page;
 
+use Ernestdefoe\Seo\SeoMeta\SeoMeta;
+use Ernestdefoe\Seo\SeoProperties;
 use Flarum\Foundation\DispatchEventsTrait;
 use Flarum\Http\RequestUtil;
 use Flarum\Tags\TagRepository;
@@ -9,8 +11,6 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Ernestdefoe\Seo\SeoMeta\SeoMeta;
-use Ernestdefoe\Seo\SeoProperties;
 
 class TagPage implements PageDriverInterface
 {
@@ -61,7 +61,7 @@ class TagPage implements PageDriverInterface
         $tagId = Arr::get($request->getQueryParams(), 'slug');
 
         // I do support it, but it didn't work
-        if (!is_numeric($tagId)) {
+        if (! is_numeric($tagId)) {
             $tagId = $this->tagRepository->getIdForSlug($tagId);
         }
 
@@ -87,9 +87,9 @@ class TagPage implements PageDriverInterface
             ->setSchemaJson('@type', 'CollectionPage')
             ->setSchemaJson('about', $seoMeta->description)
             // Tag URL
-            ->setUrl('/t/' . $tag->slug)
+            ->setUrl('/t/'.$tag->slug)
 
             // Canonical url
-            ->setCanonicalUrl('/t/' . $tag->slug);
+            ->setCanonicalUrl('/t/'.$tag->slug);
     }
 }

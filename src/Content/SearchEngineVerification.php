@@ -30,9 +30,9 @@ class SearchEngineVerification
      * Setting key → meta tag `name` attribute.
      */
     public const PROVIDERS = [
-        'seo_google_site_verification'    => 'google-site-verification',
-        'seo_bing_site_verification'      => 'msvalidate.01',
-        'seo_yandex_site_verification'    => 'yandex-verification',
+        'seo_google_site_verification' => 'google-site-verification',
+        'seo_bing_site_verification' => 'msvalidate.01',
+        'seo_yandex_site_verification' => 'yandex-verification',
         'seo_pinterest_site_verification' => 'p:domain_verify',
     ];
 
@@ -70,7 +70,7 @@ class SearchEngineVerification
             // A verification meta tag is not worth blocking page render.
             $this->log->error('[seo] SearchEngineVerification failed', [
                 'exception' => get_class($e),
-                'message'   => $e->getMessage(),
+                'message' => $e->getMessage(),
             ]);
         }
     }

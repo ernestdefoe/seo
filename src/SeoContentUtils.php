@@ -23,7 +23,7 @@ class SeoContentUtils
         $description = html_entity_decode(strip_tags((string) $content), ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
         return trim(preg_replace('/\s+/', ' ', mb_substr($description, 0, 157)))
-            . (mb_strlen($description) > 157 ? '...' : '');
+            .(mb_strlen($description) > 157 ? '...' : '');
     }
 
     /**

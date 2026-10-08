@@ -3,12 +3,12 @@
 namespace Ernestdefoe\Seo\Subscribers;
 
 use Ernestdefoe\Seo\SeoMeta\SeoMeta;
-use Illuminate\Contracts\Events\Dispatcher;
 use Flarum\Post\Event as PostEvent;
+use Illuminate\Contracts\Events\Dispatcher;
 use Psr\Log\LoggerInterface;
 
 /**
- * Subscribe to post deleting, posted or revised
+ * Subscribe to post deleting, posted or revised.
  */
 class PostSubscriber
 {
@@ -17,11 +17,12 @@ class PostSubscriber
     public function __construct(
         private DiscussionSubscriber $discussionSubscriber,
         private LoggerInterface $log
-    ) {}
+    ) {
+    }
 
     /**
-     * Subscribe to events
-     * 
+     * Subscribe to events.
+     *
      * @param Dispatcher $events
      */
     public function subscribe($events): void
@@ -32,7 +33,7 @@ class PostSubscriber
     }
 
     /**
-     * Handle model event
+     * Handle model event.
      *
      * @param PostEvent\Deleting|PostEvent\Posted|PostEvent\Revised $event
      */
@@ -48,7 +49,9 @@ class PostSubscriber
         // (Post\Posted, Post\Revised, Post\Deleting) fired for the
         // orphan. Bail cleanly instead.
         $discussion = $event->post->discussion;
-        if ($discussion === null) return;
+        if ($discussion === null) {
+            return;
+        }
 
         // SEO meta maintenance must never break the post action itself. A meta
         // save() can fail (DB hiccup, constraint, etc.); catch + log it rather
@@ -58,12 +61,12 @@ class PostSubscriber
             $meta = SeoMeta::findOneByModel($discussion);
 
             // Create new meta by model
-            if (!$meta) {
+            if (! $meta) {
                 $meta = SeoMeta::buildByModel($discussion);
             }
 
             // Do not auto update
-            if (!$meta->auto_update_data) {
+            if (! $meta->auto_update_data) {
                 return;
             }
 
@@ -73,7 +76,7 @@ class PostSubscriber
             $meta->save();
         } catch (\Throwable $e) {
             $this->log->warning('[seo] failed to update discussion SEO meta for discussion '
-                . $discussion->id . ': ' . $e->getMessage());
+                .$discussion->id.': '.$e->getMessage());
         }
     }
 }

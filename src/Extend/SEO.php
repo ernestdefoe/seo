@@ -2,11 +2,11 @@
 
 namespace Ernestdefoe\Seo\Extend;
 
-use Flarum\Extension\Extension;
+use Ernestdefoe\Seo\Page\PageManager;
 use Flarum\Extend\ExtenderInterface;
+use Flarum\Extension\Extension;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Arr;
-use Ernestdefoe\Seo\Page\PageManager;
 
 class SEO implements ExtenderInterface
 {
@@ -14,7 +14,7 @@ class SEO implements ExtenderInterface
     protected $extenders = [];
 
     /**
-     * Register a new extender
+     * Register a new extender.
      *
      * @param string $name Unique extender name
      * @param class-string<\Ernestdefoe\Seo\Page\PageDriverInterface> $extender Extender class
@@ -27,7 +27,7 @@ class SEO implements ExtenderInterface
     }
 
     /**
-     * Remove existing extender
+     * Remove existing extender.
      *
      * @param string $name Extender name
      */
@@ -40,7 +40,7 @@ class SEO implements ExtenderInterface
     }
 
     /**
-     * Extender
+     * Extender.
      */
     public function extend(Container $container, ?Extension $extension = null): void
     {

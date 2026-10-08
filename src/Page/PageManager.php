@@ -2,10 +2,9 @@
 
 namespace Ernestdefoe\Seo\Page;
 
+use Ernestdefoe\Seo\SeoExtenderManagerInterface;
 use Flarum\Extension\ExtensionManager;
 use Illuminate\Support\Collection;
-use Ernestdefoe\Seo\Page\PageDriverInterface;
-use Ernestdefoe\Seo\SeoExtenderManagerInterface;
 
 class PageManager implements SeoExtenderManagerInterface
 {
@@ -28,8 +27,8 @@ class PageManager implements SeoExtenderManagerInterface
     }
 
     /**
-     * Add page extender
-     * 
+     * Add page extender.
+     *
      * @param string $name Extender name
      * @param PageDriverInterface $extender Extender
      */
@@ -39,7 +38,7 @@ class PageManager implements SeoExtenderManagerInterface
     }
 
     /**
-     * Get all extenders
+     * Get all extenders.
      */
     /** @return array<string, PageDriverInterface> */
     public function getExtenders(?string $routeName = null): array
@@ -52,7 +51,7 @@ class PageManager implements SeoExtenderManagerInterface
     }
 
     /**
-     * Filter on active extenders
+     * Filter on active extenders.
      */
     public function getActiveExtenders(): Collection
     {
@@ -60,7 +59,7 @@ class PageManager implements SeoExtenderManagerInterface
             // Filter drivers that require extensions to be enabled
             ->filter(function (PageDriverInterface $extender) {
                 foreach ($extender->extensionDependencies() as $extensionId) {
-                    if (!$this->extensionManager->isEnabled($extensionId)) {
+                    if (! $this->extensionManager->isEnabled($extensionId)) {
                         return false;
                     }
                 }

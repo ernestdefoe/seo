@@ -2,8 +2,8 @@
 
 namespace Ernestdefoe\Seo;
 
-use Illuminate\Support\Collection;
 use Ernestdefoe\Seo\Page\PageDriverInterface;
+use Illuminate\Support\Collection;
 
 interface SeoExtenderManagerInterface
 {

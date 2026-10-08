@@ -42,8 +42,8 @@ class UploadSocialMediaImageController implements RequestHandlerInterface
     public const MAX_BYTES = 4 * 1024 * 1024;
 
     public const ALLOWED_EXT_MIME = [
-        'png'  => ['image/png'],
-        'jpg'  => ['image/jpeg'],
+        'png' => ['image/png'],
+        'jpg' => ['image/jpeg'],
         'jpeg' => ['image/jpeg'],
         'webp' => ['image/webp'],
     ];
@@ -74,14 +74,14 @@ class UploadSocialMediaImageController implements RequestHandlerInterface
             $size = $file->getSize();
             if ($size === null || $size <= 0 || $size > self::MAX_BYTES) {
                 throw new ValidationException([
-                    'seo_social_media_image' => 'Image must be 1 byte to ' . self::MAX_BYTES . ' bytes.',
+                    'seo_social_media_image' => 'Image must be 1 byte to '.self::MAX_BYTES.' bytes.',
                 ]);
             }
 
             $ext = strtolower(pathinfo((string) $file->getClientFilename(), PATHINFO_EXTENSION));
             if (! isset(self::ALLOWED_EXT_MIME[$ext])) {
                 throw new ValidationException([
-                    'seo_social_media_image' => 'Allowed extensions: ' . implode(', ', array_keys(self::ALLOWED_EXT_MIME)),
+                    'seo_social_media_image' => 'Allowed extensions: '.implode(', ', array_keys(self::ALLOWED_EXT_MIME)),
                 ]);
             }
 
@@ -104,10 +104,13 @@ class UploadSocialMediaImageController implements RequestHandlerInterface
             // new write on cleanup failure.
             $previousPath = $this->settings->get('seo_social_media_image_path');
             if ($previousPath && $this->disk->exists($previousPath)) {
-                try { $this->disk->delete($previousPath); } catch (\Throwable) { /* ignore */ }
+                try {
+                    $this->disk->delete($previousPath);
+                } catch (\Throwable) { /* ignore */
+                }
             }
 
-            $uploadName = 'seo-social-' . Str::lower(Str::random(12)) . '.' . $ext;
+            $uploadName = 'seo-social-'.Str::lower(Str::random(12)).'.'.$ext;
             $this->disk->put($uploadName, $file->getStream()->getContents());
 
             $url = $this->disk->url($uploadName);
@@ -116,7 +119,7 @@ class UploadSocialMediaImageController implements RequestHandlerInterface
 
             return new JsonResponse([
                 'data' => [
-                    'type'       => 'forums',
+                    'type' => 'forums',
                     'attributes' => [
                         'seoSocialMediaImageUrl' => $url,
                     ],
@@ -127,9 +130,10 @@ class UploadSocialMediaImageController implements RequestHandlerInterface
         } catch (\Throwable $e) {
             $this->log->error('[seo] UploadSocialMediaImageController failed', [
                 'exception' => get_class($e),
-                'message'   => $e->getMessage(),
-                'file'      => $e->getFile() . ':' . $e->getLine(),
+                'message' => $e->getMessage(),
+                'file' => $e->getFile().':'.$e->getLine(),
             ]);
+
             return new JsonResponse(['errors' => [['status' => '500', 'detail' => 'Upload failed.']]], 500);
         }
     }

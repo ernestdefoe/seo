@@ -2,10 +2,9 @@
 
 namespace Ernestdefoe\Seo\Page;
 
+use Ernestdefoe\Seo\SeoProperties;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Ernestdefoe\Seo\Page\PageDriverInterface;
-use Ernestdefoe\Seo\SeoProperties;
 
 class IndexPage implements PageDriverInterface
 {
@@ -49,7 +48,7 @@ class IndexPage implements PageDriverInterface
         $properties->setCanonicalUrl('');
 
         // Update meta tag URL when it's the discussion overview page
-        if ($routeName === "default" && $this->settings->get('default_route') !== '/all') {
+        if ($routeName === 'default' && $this->settings->get('default_route') !== '/all') {
             $properties->setUrl('/all');
             $properties->setCanonicalUrl('/all');
         }

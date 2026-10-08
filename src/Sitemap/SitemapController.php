@@ -56,7 +56,8 @@ class SitemapController implements RequestHandlerInterface
         protected SettingsRepositoryInterface $settings,
         protected CacheRepository $cache,
         protected LoggerInterface $log,
-    ) {}
+    ) {
+    }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
@@ -83,15 +84,16 @@ class SitemapController implements RequestHandlerInterface
             );
 
             return new TextResponse($xml, 200, [
-                'Content-Type'  => 'application/xml; charset=UTF-8',
-                'Cache-Control' => 'public, max-age=' . self::CACHE_TTL,
+                'Content-Type' => 'application/xml; charset=UTF-8',
+                'Cache-Control' => 'public, max-age='.self::CACHE_TTL,
             ]);
         } catch (\Throwable $e) {
             $this->log->error('[seo] SitemapController failed', [
                 'exception' => get_class($e),
-                'message'   => $e->getMessage(),
-                'file'      => $e->getFile() . ':' . $e->getLine(),
+                'message' => $e->getMessage(),
+                'file' => $e->getFile().':'.$e->getLine(),
             ]);
+
             return new TextResponse('Sitemap generation failed.', 500, ['Content-Type' => 'text/plain']);
         }
     }
@@ -106,7 +108,7 @@ class SitemapController implements RequestHandlerInterface
 
         // Home page — daily priority 1.0
         $sb[] = $this->urlNode(
-            $forumBase . '/',
+            $forumBase.'/',
             Carbon::now()->subDay(),
             'daily',
             '1.0'
@@ -125,14 +127,14 @@ class SitemapController implements RequestHandlerInterface
             ->cursor()
             ->each(function (Discussion $d) use (&$sb, $forumBase) {
                 $slug = $d->slug ?? '';
-                $path = '/d/' . $d->id . ($slug !== '' ? '-' . rawurlencode($slug) : '');
+                $path = '/d/'.$d->id.($slug !== '' ? '-'.rawurlencode($slug) : '');
 
                 $lastMod = $d->last_posted_at ?? $d->created_at ?? Carbon::now();
                 $changeFreq = $this->changeFreq($d);
-                $priority   = $this->priority($d);
+                $priority = $this->priority($d);
 
                 $sb[] = $this->urlNode(
-                    $forumBase . $path,
+                    $forumBase.$path,
                     $lastMod,
                     $changeFreq,
                     $priority
@@ -150,11 +152,11 @@ class SitemapController implements RequestHandlerInterface
     protected function urlNode(string $loc, Carbon $lastMod, string $changeFreq, string $priority): string
     {
         return '  <url>'
-            . '<loc>' . htmlspecialchars($loc, ENT_QUOTES | ENT_XML1, 'UTF-8') . '</loc>'
-            . '<lastmod>' . $lastMod->toIso8601String() . '</lastmod>'
-            . '<changefreq>' . $changeFreq . '</changefreq>'
-            . '<priority>' . $priority . '</priority>'
-            . '</url>';
+            .'<loc>'.htmlspecialchars($loc, ENT_QUOTES | ENT_XML1, 'UTF-8').'</loc>'
+            .'<lastmod>'.$lastMod->toIso8601String().'</lastmod>'
+            .'<changefreq>'.$changeFreq.'</changefreq>'
+            .'<priority>'.$priority.'</priority>'
+            .'</url>';
     }
 
     /**
@@ -171,12 +173,13 @@ class SitemapController implements RequestHandlerInterface
             return 'monthly';
         }
         $daysSince = $lastPosted->diffInDays(Carbon::now());
+
         return match (true) {
-            $daysSince <= 1   => 'hourly',
-            $daysSince <= 7   => 'daily',
-            $daysSince <= 30  => 'weekly',
+            $daysSince <= 1 => 'hourly',
+            $daysSince <= 7 => 'daily',
+            $daysSince <= 30 => 'weekly',
             $daysSince <= 365 => 'monthly',
-            default           => 'yearly',
+            default => 'yearly',
         };
     }
 

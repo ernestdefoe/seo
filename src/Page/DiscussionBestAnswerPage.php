@@ -2,13 +2,15 @@
 
 namespace Ernestdefoe\Seo\Page;
 
+use Ernestdefoe\Seo\SeoMeta\SeoMeta;
+use Ernestdefoe\Seo\SeoProperties;
 use Flarum\Database\Eloquent\Collection;
 use Flarum\Discussion\Discussion;
 use Flarum\Extension\ExtensionManager;
 use Flarum\Foundation\DispatchEventsTrait;
 use Flarum\Http\RequestUtil;
-use Flarum\Http\UrlGenerator;
 use Flarum\Http\SlugManager;
+use Flarum\Http\UrlGenerator;
 use Flarum\Post\CommentPost;
 use Flarum\Post\Post;
 use Flarum\Settings\SettingsRepositoryInterface;
@@ -19,9 +21,6 @@ use Flarum\User\UserRepository;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
 use Psr\Http\Message\ServerRequestInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
-use Ernestdefoe\Seo\SeoMeta\SeoMeta;
-use Ernestdefoe\Seo\SeoProperties;
 
 class DiscussionBestAnswerPage implements PageDriverInterface
 {
@@ -112,7 +111,9 @@ class DiscussionBestAnswerPage implements PageDriverInterface
         SeoProperties $properties
     ): void {
         // Simple discussion tags is set up
-        if ($this->settingsRepositoryInterface->get('seo_post_crawler', 0) == 0) return;
+        if ($this->settingsRepositoryInterface->get('seo_post_crawler', 0) == 0) {
+            return;
+        }
 
         // Get discussion ID from params
         $discussionId = Arr::get($request->getQueryParams(), 'id');
@@ -142,8 +143,9 @@ class DiscussionBestAnswerPage implements PageDriverInterface
         /** @var Collection<int, Tag> $discussionTags */
         $discussionTags = $discussion->tags;
 
-        if (!$enableBestAnswer || !$discussionTags->contains(fn(Tag $tag) => (bool)$tag->is_qna )) {
+        if (! $enableBestAnswer || ! $discussionTags->contains(fn (Tag $tag) => (bool) $tag->is_qna)) {
             $this->discussionFallback->describe($request, $properties);
+
             return;
         }
 
@@ -159,7 +161,7 @@ class DiscussionBestAnswerPage implements PageDriverInterface
 
         // Update ld-json
         $properties
-            ->setSchemaJson('@type', "QAPage")
+            ->setSchemaJson('@type', 'QAPage')
 
             // Set page type article
             ->setMetaPropertyTag('og:type', 'article');
@@ -171,7 +173,7 @@ class DiscussionBestAnswerPage implements PageDriverInterface
         $bestAnswerId = $discussion->best_answer_post_id;
 
         // Update topic url
-        $properties->setUrl($this->urlGenerator->to('forum')->route('discussion', ['id' => $discussion->id . '-' . $discussion->slug]), false);
+        $properties->setUrl($this->urlGenerator->to('forum')->route('discussion', ['id' => $discussion->id.'-'.$discussion->slug]), false);
 
         // Schema
         $mainEntity = [
@@ -188,9 +190,9 @@ class DiscussionBestAnswerPage implements PageDriverInterface
             'text' => $firstPost instanceof CommentPost ? html_entity_decode(strip_tags($firstPost->formatContent()), ENT_QUOTES | ENT_HTML5, 'UTF-8') : '',
             'dateCreated' => $seoMeta->created_at,
             'author' => [
-                "@type" => "Person",
-                "name" => $discussion->user?->getDisplayNameAttribute(),
-                "url" => $discussion->user ? $this->urlGenerator->to('forum')->route('user', ['username' => $this->slugManager->forResource(User::class)->toSlug($discussion->user)]) : null,
+                '@type' => 'Person',
+                'name' => $discussion->user?->getDisplayNameAttribute(),
+                'url' => $discussion->user ? $this->urlGenerator->to('forum')->route('user', ['username' => $this->slugManager->forResource(User::class)->toSlug($discussion->user)]) : null,
             ],
             'answerCount' => $discussion->comment_count - 1
         ];
@@ -198,7 +200,7 @@ class DiscussionBestAnswerPage implements PageDriverInterface
         // Generate a breadcrumb if discussion has tags
         if ($discussionTags->count() >= 1) {
             $properties->generateSchemaBreadcrumb(
-                $discussionTags->map(fn(Tag $tag) => [
+                $discussionTags->map(fn (Tag $tag) => [
                     'name' => $tag->name,
                     'url' => $this->urlGenerator->to('forum')->route('tag', ['slug' => $tag->slug])
                 ])->toArray()
@@ -228,7 +230,7 @@ class DiscussionBestAnswerPage implements PageDriverInterface
                 ->where('number', '>', '1')
                 ->first();
 
-            if ($acceptedPost instanceof CommentPost && !$acceptedPost->is_private) {
+            if ($acceptedPost instanceof CommentPost && ! $acceptedPost->is_private) {
                 $mainEntity['acceptedAnswer'] = $this->buildAnswer($acceptedPost, $discussion, $enableLikes);
             }
         }
@@ -273,7 +275,7 @@ class DiscussionBestAnswerPage implements PageDriverInterface
             '@type' => 'Answer',
             'text' => html_entity_decode(strip_tags($post->formatContent()), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
             'dateCreated' => $post->created_at->toIso8601String(),
-            'url' => $this->urlGenerator->to('forum')->route('discussion', ['id' => $discussion->id . '-' . $discussion->slug, 'near' => $post->number]),
+            'url' => $this->urlGenerator->to('forum')->route('discussion', ['id' => $discussion->id.'-'.$discussion->slug, 'near' => $post->number]),
             'author' => [
                 '@type' => 'Person',
                 'name' => $post->user ? $post->user->display_name : null,
