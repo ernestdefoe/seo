@@ -21,6 +21,11 @@
       "Ernestdefoe\\Seo\\": "src/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Ernestdefoe\\Seo\\Tests\\": "tests/"
+    }
+  },
   "require": {
     "php": "^8.3",
     "flarum/core": "^2.0",
@@ -30,7 +35,8 @@
     "flarum/tags": "^2.0",
     "fof/pages": "^2.0",
     "fof/best-answer": "^2.0",
-    "flarum/phpstan": "^2.0"
+    "flarum/phpstan": "^2.0",
+    "flarum/testing": "^2.0"
   },
   "minimum-stability": "beta",
   "prefer-stable": true,
@@ -57,7 +63,19 @@
     }
   },
   "scripts": {
+    "test": [
+      "@test:integration"
+    ],
+    "test:integration": "phpunit -c tests/phpunit.integration.xml",
+    "test:setup": "@php tests/integration/setup.php",
     "analyse:phpstan": "phpstan analyse",
     "clear-cache:phpstan": "phpstan clear-result-cache"
+  },
+  "scripts-descriptions": {
+    "test": "Runs all tests.",
+    "test:integration": "Runs all integration tests.",
+    "test:setup": "Sets up a database for use with integration tests. Execute this only once.",
+    "analyse:phpstan": "Run static analysis",
+    "clear-cache:phpstan": "Clear the PHPStan result cache"
   }
 }
