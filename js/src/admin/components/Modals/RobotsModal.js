@@ -8,7 +8,7 @@ export default class RobotsModal extends FormModal {
   oninit(vnode) {
     super.oninit(vnode);
 
-    this.value = typeof app.data.settings.seo_robots_text === "undefined" ? '' : app.data.settings.seo_robots_text;
+    this.value = typeof app.data.settings.seo_robots_text === 'undefined' ? '' : app.data.settings.seo_robots_text;
     this.startValue = this.value;
 
     this.closeText = 'Close';
@@ -28,18 +28,16 @@ export default class RobotsModal extends FormModal {
       <div>
         <div className="Modal-body">
           {m('textarea', {
-            className: "FormControl",
+            className: 'FormControl',
             value: this.value,
             placeholder: 'Add text to the robots.txt',
             rows: 15,
             oninput: (event) => {
               this.change(event.target.value);
-            }
+            },
           })}
         </div>
-        <div style="padding: 25px 30px; text-align: center;">
-          {this.closeDialogButton()}
-        </div>
+        <div style="padding: 25px 30px; text-align: center;">{this.closeDialogButton()}</div>
       </div>
     );
   }
@@ -52,10 +50,7 @@ export default class RobotsModal extends FormModal {
 
   closeDialogButton() {
     return (
-      <Button
-        type="submit"
-        className="Button Button--primary"
-        loading={this.loading}>
+      <Button type="submit" className="Button Button--primary" loading={this.loading}>
         {this.closeText}
       </Button>
     );
@@ -63,7 +58,7 @@ export default class RobotsModal extends FormModal {
 
   // Close or save setting
   onsubmit(e) {
-    if(this.value === this.startValue) {
+    if (this.value === this.startValue) {
       this.hide();
       return;
     }
@@ -73,9 +68,7 @@ export default class RobotsModal extends FormModal {
     let data = {};
     data.seo_robots_text = this.value;
 
-    saveSettings(data).then(
-      this.onsaved.bind(this)
-    );
+    saveSettings(data).then(this.onsaved.bind(this));
   }
 
   onsaved() {

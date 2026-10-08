@@ -56,9 +56,8 @@ export default class Sitemap extends Page {
       <div>
         <h2>Sitemap</h2>
         <p>
-          A sitemap is an XML file that lists every public page on your forum so search
-          engines can crawl and index them. Without one, new discussions take longer to
-          appear in search results.
+          A sitemap is an XML file that lists every public page on your forum so search engines can crawl and index them. Without one, new discussions
+          take longer to appear in search results.
         </p>
 
         {this.statusBanner(provider)}
@@ -89,10 +88,11 @@ export default class Sitemap extends Page {
     if (provider === 'fof') {
       return (
         <div className="row-not-passed-error" style="background:#e8f5e9;color:#1b5e20;border-color:#a5d6a7;">
-          <i className="fas fa-check-circle" /> <b>FoF Sitemap is active.</b>{' '}
-          The friendsofflarum/sitemap extension is installed and serving{' '}
-          <a href={sitemapUrl} target="_blank">/sitemap.xml <i className="fas fa-external-link-alt" /></a>.{' '}
-          This extension's bundled sitemap is automatically deferred — no conflict.
+          <i className="fas fa-check-circle" /> <b>FoF Sitemap is active.</b> The friendsofflarum/sitemap extension is installed and serving{' '}
+          <a href={sitemapUrl} target="_blank">
+            /sitemap.xml <i className="fas fa-external-link-alt" />
+          </a>
+          . This extension's bundled sitemap is automatically deferred — no conflict.
         </div>
       );
     }
@@ -100,10 +100,11 @@ export default class Sitemap extends Page {
     if (provider === 'bundled') {
       return (
         <div className="row-not-passed-error" style="background:#e8f5e9;color:#1b5e20;border-color:#a5d6a7;">
-          <i className="fas fa-check-circle" /> <b>Bundled sitemap is active.</b>{' '}
-          This extension is serving{' '}
-          <a href={sitemapUrl} target="_blank">/sitemap.xml <i className="fas fa-external-link-alt" /></a>.{' '}
-          Generated from your guest-visible discussions, capped at 50,000 URLs, cached for 6 hours.
+          <i className="fas fa-check-circle" /> <b>Bundled sitemap is active.</b> This extension is serving{' '}
+          <a href={sitemapUrl} target="_blank">
+            /sitemap.xml <i className="fas fa-external-link-alt" />
+          </a>
+          . Generated from your guest-visible discussions, capped at 50,000 URLs, cached for 6 hours.
         </div>
       );
     }
@@ -111,10 +112,8 @@ export default class Sitemap extends Page {
     // provider === 'none'
     return (
       <div className="row-not-passed-error">
-        <i className="fas fa-exclamation-circle" /> <b>No sitemap is being served.</b>{' '}
-        You've turned off the bundled sitemap and FoF Sitemap isn't installed.
-        Search engines will have a harder time finding your content. Pick an option below
-        to fix this.
+        <i className="fas fa-exclamation-circle" /> <b>No sitemap is being served.</b> You've turned off the bundled sitemap and FoF Sitemap isn't
+        installed. Search engines will have a harder time finding your content. Pick an option below to fix this.
       </div>
     );
   }
@@ -130,13 +129,13 @@ export default class Sitemap extends Page {
             type="radio"
             name="seo_sitemap_mode"
             checked={this.mode === 'bundled'}
-            onchange={() => { this.mode = 'bundled'; }}
+            onchange={() => {
+              this.mode = 'bundled';
+            }}
             style="margin-right:8px;"
           />
           <b>Use the bundled sitemap</b> <span style="opacity:0.75;">(recommended for most forums)</span>
-          <div style="font-size:13px;opacity:0.8;margin-left:24px;">
-            Zero install. Generated on demand from your discussions, capped at 50k URLs.
-          </div>
+          <div style="font-size:13px;opacity:0.8;margin-left:24px;">Zero install. Generated on demand from your discussions, capped at 50k URLs.</div>
         </label>
 
         <label style="display:block;margin:10px 0;cursor:pointer;">
@@ -144,22 +143,30 @@ export default class Sitemap extends Page {
             type="radio"
             name="seo_sitemap_mode"
             checked={this.mode === 'off'}
-            onchange={() => { this.mode = 'off'; }}
+            onchange={() => {
+              this.mode = 'off';
+            }}
             style="margin-right:8px;"
           />
           <b>Turn off the bundled sitemap</b>
           <div style="font-size:13px;opacity:0.8;margin-left:24px;">
-            Pick this if you plan to install <a href="https://discuss.flarum.org/d/14941-fof-sitemap" target="_blank">FoF Sitemap <i className="fas fa-external-link-alt" /></a>{' '}
+            Pick this if you plan to install{' '}
+            <a href="https://discuss.flarum.org/d/14941-fof-sitemap" target="_blank">
+              FoF Sitemap <i className="fas fa-external-link-alt" />
+            </a>{' '}
             (it auto-takes over once installed), or you handle <code>/sitemap.xml</code> yourself via CDN / static file.
           </div>
         </label>
 
-        {Button.component({
-          className: 'Button Button--primary',
-          onclick: () => this.save(),
-          loading: this.saving,
-          disabled: this.mode === (app.data.settings.seo_sitemap_mode === 'off' ? 'off' : 'bundled'),
-        }, 'Save preference')}
+        {Button.component(
+          {
+            className: 'Button Button--primary',
+            onclick: () => this.save(),
+            loading: this.saving,
+            disabled: this.mode === (app.data.settings.seo_sitemap_mode === 'off' ? 'off' : 'bundled'),
+          },
+          'Save preference'
+        )}
       </div>
     );
   }
@@ -182,7 +189,9 @@ export default class Sitemap extends Page {
             <tr>
               <td>Install</td>
               <td>Zero — already here</td>
-              <td><code>composer require fof/sitemap</code> + enable</td>
+              <td>
+                <code>composer require fof/sitemap</code> + enable
+              </td>
             </tr>
             <tr>
               <td>URL cap</td>
@@ -219,15 +228,13 @@ export default class Sitemap extends Page {
 
         {fofInstalled ? (
           <p>
-            <i className="fas fa-info-circle" /> FoF Sitemap is installed, so it owns{' '}
-            <code>/sitemap.xml</code> automatically. This extension's bundled sitemap
-            is deferred to avoid a route conflict — no action needed from you.
+            <i className="fas fa-info-circle" /> FoF Sitemap is installed, so it owns <code>/sitemap.xml</code> automatically. This extension's
+            bundled sitemap is deferred to avoid a route conflict — no action needed from you.
           </p>
         ) : (
           <p>
-            <i className="fas fa-info-circle" /> If you install FoF Sitemap later, this
-            extension will automatically defer to it. You don't need to change the setting
-            above first.
+            <i className="fas fa-info-circle" /> If you install FoF Sitemap later, this extension will automatically defer to it. You don't need to
+            change the setting above first.
           </p>
         )}
       </div>

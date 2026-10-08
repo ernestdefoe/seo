@@ -8,9 +8,9 @@ import SeoWidget from './components/SeoWidget';
 // have a corresponding extender (dashboard widget injection) stays here
 // as a plain initializer.
 app.initializers.add('ernestdefoe-seo', () => {
-    extend(DashboardPage.prototype, 'availableWidgets', (widgets) => {
-        widgets.add('seo-widget', <SeoWidget />, 500);
-    });
+  extend(DashboardPage.prototype, 'availableWidgets', (widgets) => {
+    widgets.add('seo-widget', <SeoWidget />, 500);
+  });
 });
 
 export { default as extend } from './extend';

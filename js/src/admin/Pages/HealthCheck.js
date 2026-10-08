@@ -1,6 +1,6 @@
 import Page from 'flarum/common/components/Page';
 import Button from 'flarum/common/components/Button';
-import Header from "../components/Header";
+import Header from '../components/Header';
 import saveSettings from 'flarum/admin/utils/saveSettings';
 
 export default class HealthCheck extends Page {
@@ -14,8 +14,20 @@ export default class HealthCheck extends Page {
   view() {
     return (
       <div>
-        <p className="seo-intro">A quick SEO-health-check overview. When you have issues, <a href="https://github.com/ernestdefoe/seo/issues" target="_blank">create a new issue <i className="fas fa-external-link-alt"/></a> on this extension's repository.</p>
-        <p className="seo-intro">Are you a developer with some free time left? Contribute to the project <a href="https://github.com/ernestdefoe/seo" target="_blank">on GitHub <i className="fas fa-external-link-alt"/></a>.</p>
+        <p className="seo-intro">
+          A quick SEO-health-check overview. When you have issues,{' '}
+          <a href="https://github.com/ernestdefoe/seo/issues" target="_blank">
+            create a new issue <i className="fas fa-external-link-alt" />
+          </a>{' '}
+          on this extension's repository.
+        </p>
+        <p className="seo-intro">
+          Are you a developer with some free time left? Contribute to the project{' '}
+          <a href="https://github.com/ernestdefoe/seo" target="_blank">
+            on GitHub <i className="fas fa-external-link-alt" />
+          </a>
+          .
+        </p>
 
         <p className="seo-intro">For optimal search engine results, make sure all checks are green.</p>
 
@@ -44,19 +56,18 @@ export default class HealthCheck extends Page {
   }
 
   // Forum description
-  forumDescription()
-  {
-    let passed = typeof this.settings.forum_description !== "undefined" && this.settings.forum_description !== '' ? true : 'must';
+  forumDescription() {
+    let passed = typeof this.settings.forum_description !== 'undefined' && this.settings.forum_description !== '' ? true : 'must';
     let reason = 'You did not set up a forum description yet!';
 
     // Check minimal 20 characters
-    if(passed === true && this.settings.forum_description.length <= 20) {
+    if (passed === true && this.settings.forum_description.length <= 20) {
       passed = false;
       reason = 'Your forum description is lower then 20 characters. Please expand it for better search results.';
     }
 
     // Check description is not default text
-    if(passed === true && this.settings.forum_description.indexOf('This is beta software') >= 0) {
+    if (passed === true && this.settings.forum_description.indexOf('This is beta software') >= 0) {
       passed = 'must';
       reason = 'You did not change the default forum description after installation!';
     }
@@ -73,9 +84,8 @@ export default class HealthCheck extends Page {
   }
 
   // Forum keywords
-  forumKeywords()
-  {
-    let passed = typeof this.settings.forum_keywords !== "undefined" && this.settings.forum_keywords !== '' ? true : false;
+  forumKeywords() {
+    let passed = typeof this.settings.forum_keywords !== 'undefined' && this.settings.forum_keywords !== '' ? true : false;
     let reason = 'You did not set up a forum keywords yet!';
 
     return (
@@ -90,8 +100,7 @@ export default class HealthCheck extends Page {
   }
 
   // Does the site has SSL as default transport?
-  siteUsesSSL()
-  {
+  siteUsesSSL() {
     let passed = app.forum.attribute('baseUrl').indexOf('https://') >= 0 ? true : 'must';
 
     return (
@@ -99,12 +108,12 @@ export default class HealthCheck extends Page {
         <td>
           Your site has a secure connection available (SSL/TLS)
           {this.notPassedError(
-            passed, 
-            'Your forum does not force a SSL/TLS connection (a secure connection to your website). Most search engines won\'t index your website or lower your ranking if you have no secure connection available.', 
-            'How to set up SSL', 
+            passed,
+            "Your forum does not force a SSL/TLS connection (a secure connection to your website). Most search engines won't index your website or lower your ranking if you have no secure connection available.",
+            'How to set up SSL',
             app.route('extension', {
               id: 'ernestdefoe-seo',
-              page: 'ssl'
+              page: 'ssl',
             })
           )}
         </td>
@@ -114,15 +123,19 @@ export default class HealthCheck extends Page {
   }
 
   // Discussion post crawl settings
-  discussionPostSet()
-  {
-    let passed = typeof this.settings.seo_reviewed_post_crawler !== "undefined";
+  discussionPostSet() {
+    let passed = typeof this.settings.seo_reviewed_post_crawler !== 'undefined';
 
     return (
       <tr>
         <td>
           Review discussion post crawl settings
-          {this.notPassedError(passed, 'You will need to review this setting to pass.', 'Review post settings', this.getSettingUrl('discussion-post'))}
+          {this.notPassedError(
+            passed,
+            'You will need to review this setting to pass.',
+            'Review post settings',
+            this.getSettingUrl('discussion-post')
+          )}
         </td>
         {this.passed(passed)}
       </tr>
@@ -130,19 +143,23 @@ export default class HealthCheck extends Page {
   }
 
   // Review bot settings
-  socialMediaImage()
-  {
+  socialMediaImage() {
     let passed = true;
 
-    if(typeof this.settings.seo_social_media_image_path === "undefined" || this.settings.seo_social_media_image_path === null) {
-        passed = false;
+    if (typeof this.settings.seo_social_media_image_path === 'undefined' || this.settings.seo_social_media_image_path === null) {
+      passed = false;
     }
 
     return (
       <tr>
         <td>
           Set Up a social media image
-          {this.notPassedError(passed, 'You did not set a social media image for your forum. It is recommended to set one. Your favicon will now be used as preview on social media.', 'Update image', this.getSettingUrl('social-media'))}
+          {this.notPassedError(
+            passed,
+            'You did not set a social media image for your forum. It is recommended to set one. Your favicon will now be used as preview on social media.',
+            'Update image',
+            this.getSettingUrl('social-media')
+          )}
         </td>
         {this.passed(passed)}
       </tr>
@@ -150,8 +167,7 @@ export default class HealthCheck extends Page {
   }
 
   // Review bot settings
-  hasSitemap()
-  {
+  hasSitemap() {
     // This fork ships a bundled SitemapController that serves /sitemap.xml
     // when no upstream sitemap extension is installed. The check passes if
     // ANY sitemap is being served:
@@ -159,12 +175,12 @@ export default class HealthCheck extends Page {
     //   - the admin hasn't explicitly turned off our bundled one.
     const enabled = app.data.settings.extensions_enabled || '[]';
     let extList = [];
-    try { extList = JSON.parse(enabled); } catch (e) {}
+    try {
+      extList = JSON.parse(enabled);
+    } catch (e) {}
 
-    const upstreamActive = extList.indexOf('flagrow-sitemap') !== -1
-                       || extList.indexOf('fof-sitemap') !== -1;
-    const bundledActive = !upstreamActive
-                       && app.data.settings.seo_sitemap_mode !== 'off';
+    const upstreamActive = extList.indexOf('flagrow-sitemap') !== -1 || extList.indexOf('fof-sitemap') !== -1;
+    const bundledActive = !upstreamActive && app.data.settings.seo_sitemap_mode !== 'off';
 
     const passed = upstreamActive || bundledActive;
 
@@ -174,11 +190,11 @@ export default class HealthCheck extends Page {
           Your forum has a sitemap available
           {this.notPassedError(
             passed,
-            'No sitemap is being served. Either install FoF Sitemap, or re-enable this extension\'s bundled sitemap.',
+            "No sitemap is being served. Either install FoF Sitemap, or re-enable this extension's bundled sitemap.",
             'Open sitemap settings',
             app.route('extension', {
               id: 'ernestdefoe-seo',
-              page: 'sitemap'
+              page: 'sitemap',
             })
           )}
         </td>
@@ -188,12 +204,14 @@ export default class HealthCheck extends Page {
   }
 
   // Robots.txt is available
-  robotsTxt()
-  {
+  robotsTxt() {
     return (
       <tr>
         <td>
-          Your forum has a <b>robots.txt</b> available. <a href={app.forum.attribute('baseUrl') + "/robots.txt"} target="_blank" className="robots-link">Open robots.txt <i className="fas fa-external-link-alt"></i></a>
+          Your forum has a <b>robots.txt</b> available.{' '}
+          <a href={app.forum.attribute('baseUrl') + '/robots.txt'} target="_blank" className="robots-link">
+            Open robots.txt <i className="fas fa-external-link-alt"></i>
+          </a>
         </td>
         {this.passed(true)}
       </tr>
@@ -201,8 +219,7 @@ export default class HealthCheck extends Page {
   }
 
   // Robots.txt is available
-  tagsAvailable()
-  {
+  tagsAvailable() {
     return (
       <tr>
         <td>
@@ -214,21 +231,20 @@ export default class HealthCheck extends Page {
   }
 
   // Register your forum
-  registeredSearchEngines()
-  {
-    let passed = typeof this.settings.seo_reviewed_search_engines !== "undefined";
+  registeredSearchEngines() {
+    let passed = typeof this.settings.seo_reviewed_search_engines !== 'undefined';
 
     return (
       <tr>
         <td>
           Register your forum to search engines
           {this.notPassedError(
-            passed, 
-            'You will need to review this to pass.', 
-            'More information', 
+            passed,
+            'You will need to review this to pass.',
+            'More information',
             app.route('extension', {
               id: 'ernestdefoe-seo',
-              page: 'search-engines'
+              page: 'search-engines',
             })
           )}
         </td>
@@ -238,23 +254,22 @@ export default class HealthCheck extends Page {
   }
 
   // Review again
-  reviewAgain()
-  {
+  reviewAgain() {
     let passed = true;
 
     // Set current date
     let nextReviewDate = new Date();
 
     // Check if previous review date exists
-    if(typeof app.data.settings.seo_review_settings === "undefined") {
+    if (typeof app.data.settings.seo_review_settings === 'undefined') {
       passed = false;
-    }else{
+    } else {
       // Ok, it exists. Set the review date
       nextReviewDate = new Date(app.data.settings.seo_review_settings * 1000);
     }
 
     // Date passed?
-    if(passed && Math.floor(Date.now() / 1000) > app.data.settings.seo_review_settings) {
+    if (passed && Math.floor(Date.now() / 1000) > app.data.settings.seo_review_settings) {
       passed = false;
     }
 
@@ -275,9 +290,8 @@ export default class HealthCheck extends Page {
   }
 
   // Get setting URL
-  getSettingUrl(setting = '')
-  {
-    if(setting === '') {
+  getSettingUrl(setting = '') {
+    if (setting === '') {
       return app.route('extension', {
         id: 'ernestdefoe-seo',
       });
@@ -286,63 +300,64 @@ export default class HealthCheck extends Page {
     return app.route('extension', {
       id: 'ernestdefoe-seo',
       page: 'settings',
-      setting: setting
+      setting: setting,
     });
   }
 
   // Passed or not
-  passed(passed)
-  {
-    if(passed === 'must') {
+  passed(passed) {
+    if (passed === 'must') {
       return (
-        <td className='row-must'>
-          <i class="fas fa-exclamation-circle"/> Warning!
+        <td className="row-must">
+          <i class="fas fa-exclamation-circle" /> Warning!
         </td>
       );
     }
 
-    if(!passed) {
+    if (!passed) {
       return (
-        <td className='row-warning'>
-          <i class="fas fa-exclamation-circle"/> Warning!
+        <td className="row-warning">
+          <i class="fas fa-exclamation-circle" /> Warning!
         </td>
       );
     }
 
     return (
-      <td className='row-passed'>
-        <i class="fas fa-check"/> All set!
+      <td className="row-passed">
+        <i class="fas fa-check" /> All set!
       </td>
     );
   }
 
   // General not-passed error
   notPassedError(passed, reason, buttonText = 'Update setting', url = app.route('seoSettings')) {
-    if(passed === true) return;
+    if (passed === true) return;
 
     return (
       <div className="row-not-passed-error">
         {reason}
 
         <div className="button-container">
-          {Button.component({
-            className: 'Button',
-            onclick: () => {
-              if(typeof url === 'string') {
-                m.route.set(url);
-              }else{
-                url();
-              }
-            }
-          }, buttonText)}
+          {Button.component(
+            {
+              className: 'Button',
+              onclick: () => {
+                if (typeof url === 'string') {
+                  m.route.set(url);
+                } else {
+                  url();
+                }
+              },
+            },
+            buttonText
+          )}
         </div>
       </div>
     );
   }
 
   // Save
-  saveSingleSetting(setting, value)
-  {
+  saveSingleSetting(setting, value) {
     if (this.saving) return;
 
     this.saving = true;
@@ -352,7 +367,7 @@ export default class HealthCheck extends Page {
 
     saveSettings(data)
       .then(() => {
-        app.alerts.show({type: 'success'}, app.translator.trans('core.admin.settings.saved_message'));
+        app.alerts.show({ type: 'success' }, app.translator.trans('core.admin.settings.saved_message'));
       })
       .catch(() => app.alerts.show({ type: 'error' }, app.translator.trans('core.lib.error.generic_message')))
       .then(() => {

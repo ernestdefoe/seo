@@ -10,15 +10,13 @@ import SettingsPage from './Pages/SettingsPage';
 //   "Moderate" column of the permissions grid. The translator key matches
 //   locale/en.yml. Icon + category mirror the v1 registration.
 export default [
-    new Extend.Admin()
-        .page(SettingsPage)
-        .permission(
-            () => ({
-                icon: 'fas fa-search',
-                label: app.translator.trans('ernestdefoe-seo.admin.permissions.configure_seo'),
-                permission: 'seo.canConfigure',
-            }),
-            'moderate',
-            90
-        ),
+  new Extend.Admin().page(SettingsPage).permission(
+    () => ({
+      icon: 'fas fa-search',
+      label: app.translator.trans('ernestdefoe-seo.admin.permissions.configure_seo'),
+      permission: 'seo.canConfigure',
+    }),
+    'moderate',
+    90
+  ),
 ];
