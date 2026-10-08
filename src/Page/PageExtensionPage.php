@@ -92,9 +92,10 @@ class PageExtensionPage implements PageDriverInterface
             function (SeoMeta $meta) use ($page, $properties, $plainText) {
                 $meta->title = $page->title;
 
-                $meta->created_at = $page->time ?? new \DateTime();
+                // fof/pages 2 renamed time / edit_time to these.
+                $meta->created_at = $page->created_at ?? new \DateTime();
 
-                $meta->updated_at = $page->edit_time;
+                $meta->updated_at = $page->updated_at;
 
                 $meta->description = $properties->generateDescriptionFromContent($plainText);
             }
