@@ -78,7 +78,14 @@ class SeoMetaResource extends AbstractDatabaseResource
             if (! in_array($objectType, self::ALLOWED_OBJECT_TYPES, true)) {
                 return null;
             }
-            return SeoMeta::findByObjectTypeOrCreate($objectType, $objectId);
+            $meta = SeoMeta::findByObjectTypeOrCreate($objectType, $objectId);
+
+            // A row created just now raises Created, whose listeners fill it
+            // from its discussion or tag. Undispatched, the editor opened on
+            // an empty row, and the page then rendered with no title at all.
+            $this->dispatchEventsFor($meta, $actor);
+
+            return $meta;
         }
 
         return parent::find($id, $context);
