@@ -36,7 +36,7 @@ class Robots implements RequestHandlerInterface
     {
         $output = '';
 
-        if($this->settings->get('seo_allow_all_bots') !== '0') {
+        if ($this->settings->get('seo_allow_all_bots') !== '0') {
             $output .= 'User-agent: *';
             $output .= PHP_EOL.'Allow: /'.PHP_EOL;
         }
@@ -49,7 +49,7 @@ class Robots implements RequestHandlerInterface
         $output .= PHP_EOL.'Sitemap: '.$this->url->to('forum')->base().'/sitemap.xml'.PHP_EOL;
 
         // Custom robots txt
-        if($this->settings->get('seo_robots_text') !== null && $this->settings->get('seo_robots_text') !== '') {
+        if ($this->settings->get('seo_robots_text') !== null && $this->settings->get('seo_robots_text') !== '') {
             $output .= $this->settings->get('seo_robots_text');
         }
 

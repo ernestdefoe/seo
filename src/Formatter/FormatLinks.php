@@ -62,7 +62,7 @@ class FormatLinks
             $attributes['rel'] = 'ugc noopener'.($this->addNofollow($domain) ? ' nofollow' : '');
 
             // Open link in new tab
-            if(! isset($attributes['target'])) {
+            if (! isset($attributes['target'])) {
                 $attributes['target'] = $this->openInNewTab($domain) ? '_blank' : '_self';
             }
 
@@ -108,7 +108,7 @@ class FormatLinks
         $url = parse_url($url);
 
         // Invalid URL
-        if(! isset($url['host'])) {
+        if (! isset($url['host'])) {
             return '';
         }
 
